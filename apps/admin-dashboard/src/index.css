@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Ahsing";
+  src: local("Ahsing"), local("Ahsing Regular");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DG Ghayaty";
+  src: local("DG Ghayaty"), local("DG Ghayaty Regular");
+  font-display: swap;
+}
+
+body {
+  @apply font-body text-primary bg-surface;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-heading tracking-tight;
+}
