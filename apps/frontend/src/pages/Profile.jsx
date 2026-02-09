@@ -253,14 +253,23 @@ const Profile = () => {
                 if (!userRes.data.user) throw new Error("Failed to load user data");
                 setUser(userRes.data.user);
 
-                const ordersRes = await axios.get(`${process.env.REACT_APP_API_URL}/orders`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                try {
+                    const ordersRes = await axios.get(`${process.env.REACT_APP_API_URL}/orders`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
 
-                if (ordersRes.data.status === "success") {
-                    setOrders(ordersRes.data.orders || []);
-                } else {
-                    setOrders([]);
+                    if (ordersRes.data.status === "success") {
+                        setOrders(ordersRes.data.orders || []);
+                    } else {
+                        setOrders([]);
+                    }
+                } catch (ordersErr) {
+                    // Backward compatibility: some API versions return 404 when the user has no orders.
+                    if (ordersErr?.response?.status === 404) {
+                        setOrders([]);
+                    } else {
+                        throw ordersErr;
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching profile or orders:", err);

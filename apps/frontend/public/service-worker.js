@@ -1,5 +1,14 @@
-const CACHE_NAME = 'notervo-cache-v1';
+const CACHE_NAME = 'notervo-cache-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.json'];
+
+function isHttpRequest(request) {
+  try {
+    const url = new URL(request.url);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (err) {
+    return false;
+  }
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -19,7 +28,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') {
+  if (event.request.method !== 'GET' || !isHttpRequest(event.request)) {
     return;
   }
 
@@ -42,8 +51,16 @@ self.addEventListener('fetch', (event) => {
             return networkResponse;
           }
 
+          // Cache only same-origin HTTP(S) assets.
+          if (new URL(event.request.url).origin !== self.location.origin) {
+            return networkResponse;
+          }
+
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          caches
+            .open(CACHE_NAME)
+            .then((cache) => cache.put(event.request, responseToCache))
+            .catch(() => {});
           return networkResponse;
         })
         .catch(() => caches.match('/index.html'));
