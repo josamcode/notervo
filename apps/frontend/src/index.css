@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+@font-face {
+  font-family: "Ahsing";
+  src: local("Ahsing"), local("Ahsing Regular");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DG Ghayaty";
+  src: local("DG Ghayaty"), local("DG Ghayaty Regular");
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  padding-top: 67px;
+  @apply font-body text-primary bg-white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-heading tracking-tight;
+}
+
+[lang="ar"] h1,
+[lang="ar"] h2,
+[lang="ar"] h3,
+[lang="ar"] h4,
+[lang="ar"] h5,
+[lang="ar"] h6 {
+  font-family: "DG Ghayaty", "Ahsing", serif;
+}
+
+a {
+  @apply transition-colors duration-200;
+}
+
+::selection {
+  background: #222222;
+  color: #ffffff;
+}
