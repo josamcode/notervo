@@ -93,7 +93,7 @@ const getMenuSections = (isLoggedIn) => [
       { label: "About Notervo", icon: AboutIco, href: "/about" },
       { label: "Shipping & Delivery", icon: ShippingIco, href: "/shipping" },
       { label: "Return Policy", icon: ReturnIco, href: "/return-policy" },
-      { label: "Help Center", icon: HelpIco, href: "/help" },
+      { label: "Help Center", icon: HelpIco, href: "/help-center" },
       { label: "Contact Us", icon: ContactIco, href: "/contact" },
     ],
   },

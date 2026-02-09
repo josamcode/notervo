@@ -147,9 +147,10 @@ export default function HomePage() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/20" />
               <div className="relative z-10 h-full flex flex-col justify-end p-4">
-                <p className="text-[10px] text-secondary uppercase tracking-widest font-semibold mb-1">New Collection</p>
+                <p className="text-[10px] text-secondary uppercase tracking-widest font-semibold mb-1">Express your identity</p>
                 <h2 className="text-xl font-extrabold text-white leading-tight mb-2.5">
-                  Express your<br />identity
+                  We don't sell
+                  <br />notebooks
                 </h2>
                 <Link
                   to="/shop"
@@ -299,11 +300,6 @@ export default function HomePage() {
                   Explore Categories
                   <ArrowDownIcon className="w-4 h-4 animate-bounce" />
                 </button>
-              </div>
-            </div>
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-              <div className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-1.5">
-                <div className="w-1 h-2.5 rounded-full bg-white/60 animate-bounce" />
               </div>
             </div>
           </section>

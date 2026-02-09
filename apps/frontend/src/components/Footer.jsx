@@ -90,7 +90,7 @@ const Footer = () => {
                 Minimal notebooks for focused work, clear thinking, and premium everyday writing.
               </p>
               <div className="flex gap-2">
-                <SocialLink href="https://facebook.com/notervo" icon={FacebookIcon} label="Facebook" />
+                <SocialLink href="https://facebook.com/notervo.eg" icon={FacebookIcon} label="Facebook" />
                 <SocialLink href="https://instagram.com/notervo.eg" icon={InstagramIcon} label="Instagram" />
                 <SocialLink href="https://www.tiktok.com/@notervo.eg" icon={TikTokIcon} label="Tiktok" />
               </div>
