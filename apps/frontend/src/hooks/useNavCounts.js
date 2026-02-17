@@ -3,6 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useLocation } from "react-router-dom";
 import { getGuestCartCount } from "../utils/guestCart";
+import { getGuestWishlistCount } from "../utils/guestWishlist";
 
 const emptyCounts = {
   cartCount: 0,
@@ -19,7 +20,7 @@ export default function useNavCounts() {
     if (!token) {
       setCounts({
         cartCount: getGuestCartCount(),
-        wishlistCount: 0,
+        wishlistCount: getGuestWishlistCount(),
         messagesCount: 0,
       });
       return;
@@ -46,7 +47,7 @@ export default function useNavCounts() {
     } catch {
       setCounts({
         cartCount: getGuestCartCount(),
-        wishlistCount: 0,
+        wishlistCount: getGuestWishlistCount(),
         messagesCount: 0,
       });
     }

@@ -1,11 +1,21 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import {
+    addGuestWishlistItem,
+    hasGuestWishlistItem,
+    removeGuestWishlistItem,
+} from "./guestWishlist";
 
 export async function addToWishlist(productId) {
     try {
         const token = Cookies.get("token");
         if (!token) {
-            return { success: false, message: "User not authenticated." };
+            const result = addGuestWishlistItem(productId);
+            if (!result.success) {
+                return { success: false, message: result.message };
+            }
+            window.dispatchEvent(new Event("wishlistUpdated"));
+            return { success: true, data: { wishlist: { items: result.items } } };
         }
 
         const response = await axios.post(
@@ -35,7 +45,12 @@ export async function removeFromWishlist(productId) {
     try {
         const token = Cookies.get("token");
         if (!token) {
-            return { success: false, message: "User not authenticated." };
+            const result = removeGuestWishlistItem(productId);
+            if (!result.success) {
+                return { success: false, message: result.message };
+            }
+            window.dispatchEvent(new Event("wishlistUpdated"));
+            return { success: true, data: { wishlist: { items: result.items } } };
         }
 
         const response = await axios.delete(
@@ -62,7 +77,7 @@ export async function removeFromWishlist(productId) {
 
 export async function checkProductInWishlist(productId) {
     const token = Cookies.get("token");
-    if (!token) return false;
+    if (!token) return hasGuestWishlistItem(productId);
 
     try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/wishlist`, {

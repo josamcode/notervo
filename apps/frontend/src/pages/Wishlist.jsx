@@ -4,6 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, Link } from "react-router-dom";
 import { removeFromWishlist } from "../utils/WishlistUtils";
+import { getGuestWishlistItems } from "../utils/guestWishlist";
 import { showError, showSuccess } from "../utils/Toast";
 import { resolveProductImageUrl } from "../utils/imageUrl";
 import Currency from "../components/Currency";
@@ -68,7 +69,31 @@ export default function Wishlist() {
         const fetchWishlist = async () => {
             try {
                 const token = Cookies.get("token");
-                if (!token) throw new Error("User not authenticated");
+                if (!token) {
+                    const guestIds = getGuestWishlistItems();
+                    const guestItems = await Promise.all(
+                        guestIds.map(async (productId, index) => {
+                            try {
+                                const productRes = await axios.get(
+                                    `${process.env.REACT_APP_API_URL}/products/${productId}`
+                                );
+                                return {
+                                    _id: `guest-${productId}-${index}`,
+                                    productId: { _id: productId },
+                                    productDetails: productRes.data,
+                                };
+                            } catch (err) {
+                                console.error(`Failed to load product ${productId}`, err);
+                                return null;
+                            }
+                        })
+                    );
+
+                    setWishlist({
+                        items: guestItems.filter(Boolean),
+                    });
+                    return;
+                }
 
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/wishlist`, {
                     headers: { Authorization: `Bearer ${token}` },
