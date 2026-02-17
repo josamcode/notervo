@@ -1,5 +1,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import {
+  addGuestCartItem,
+  hasGuestCartItem,
+  removeGuestCartItem,
+} from "./guestCart";
 
 export async function addToCart(
   productId,
@@ -9,10 +14,6 @@ export async function addToCart(
 ) {
   try {
     const token = Cookies.get("token");
-
-    if (!token) {
-      return { success: false, message: "User not authenticated." };
-    }
 
     if (!color || !size) {
       try {
@@ -32,6 +33,22 @@ export async function addToCart(
       } catch (err) {
         console.error("Failed to fetch product details:", err);
       }
+    }
+
+    if (!token) {
+      const result = addGuestCartItem({
+        productId,
+        quantity,
+        color,
+        size,
+      });
+
+      if (!result.success) {
+        return { success: false, message: result.message };
+      }
+
+      window.dispatchEvent(new Event("cartUpdated"));
+      return { success: true, data: { cart: { items: result.items } } };
     }
 
     const response = await axios.post(
@@ -67,7 +84,12 @@ export async function removeFromCart(productId, color = null, size = null) {
     const token = Cookies.get("token");
 
     if (!token) {
-      return { success: false, message: "User not authenticated." };
+      const result = removeGuestCartItem(productId, color, size);
+      if (!result.success) {
+        return { success: false, message: result.message };
+      }
+      window.dispatchEvent(new Event("cartUpdated"));
+      return { success: true, data: { cart: { items: result.items } } };
     }
 
     const response = await axios.delete(
@@ -98,7 +120,9 @@ export async function removeFromCart(productId, color = null, size = null) {
 
 export async function checkProductInCart(productId, color, size) {
   const token = Cookies.get("token");
-  if (!token) return false;
+  if (!token) {
+    return hasGuestCartItem(productId, color, size);
+  }
 
   try {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/cart`, {

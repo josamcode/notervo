@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { showSuccess } from "../utils/Toast";
+import { getGuestCartCount } from "../utils/guestCart";
 
 /* ───────────── inline icons (no heroicons dependency) ───────────── */
 const CartIcon = ({ className = "" }) => (
@@ -105,7 +106,13 @@ export default function Header() {
   }, [location.pathname]);
 
   const fetchCounts = useCallback(async () => {
-    if (!token) return;
+    if (!token) {
+      setCartCount(getGuestCartCount());
+      setWishlistCount(0);
+      setMessagesCount(0);
+      return;
+    }
+
     try {
       const [cartRes, wishlistRes, myMessagesRes] = await Promise.all([
         axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
@@ -122,19 +129,18 @@ export default function Header() {
       setWishlistCount(wishlistRes.data.wishlist?.items?.length || 0);
       setMessagesCount(myMessagesRes.data.messages?.filter((msg) => !msg.isRead).length || 0);
     } catch {
-      setCartCount(0);
+      setCartCount(getGuestCartCount());
       setWishlistCount(0);
       setMessagesCount(0);
     }
   }, [token]);
 
   useEffect(() => {
-    if (isLoggedIn) fetchCounts();
-    else { setCartCount(0); setWishlistCount(0); setMessagesCount(0); }
+    fetchCounts();
   }, [isLoggedIn, fetchCounts]);
 
   useEffect(() => {
-    const handleUpdate = () => isLoggedIn && fetchCounts();
+    const handleUpdate = () => fetchCounts();
     window.addEventListener("cartUpdated", handleUpdate);
     window.addEventListener("wishlistUpdated", handleUpdate);
     return () => {
@@ -200,6 +206,7 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-1.5">
           {!isLoggedIn ? (
             <div className="flex items-center gap-3">
+              <IconButton to="/cart" label="Cart" icon={CartIcon} count={cartCount} />
               <Link
                 to="/login"
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors rounded-xl hover:bg-gray-50"
@@ -307,6 +314,19 @@ export default function Header() {
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
             {!isLoggedIn ? (
               <>
+                <Link
+                  to="/cart"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <CartIcon className="w-5 h-5 text-gray-400" />
+                  Cart
+                  {cartCount > 0 && (
+                    <span className="ml-auto min-w-[20px] h-5 rounded-full bg-primary px-1.5 text-[10px] font-bold text-white flex items-center justify-center">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
+                </Link>
                 <Link
                   to="/login"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"

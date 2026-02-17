@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useLocation } from "react-router-dom";
+import { getGuestCartCount } from "../utils/guestCart";
 
 const emptyCounts = {
   cartCount: 0,
@@ -16,7 +17,11 @@ export default function useNavCounts() {
 
   const fetchCounts = useCallback(async () => {
     if (!token) {
-      setCounts(emptyCounts);
+      setCounts({
+        cartCount: getGuestCartCount(),
+        wishlistCount: 0,
+        messagesCount: 0,
+      });
       return;
     }
 
@@ -39,7 +44,11 @@ export default function useNavCounts() {
         messagesCount: myMessagesRes.data.messages?.filter((msg) => !msg.isRead).length || 0,
       });
     } catch {
-      setCounts(emptyCounts);
+      setCounts({
+        cartCount: getGuestCartCount(),
+        wishlistCount: 0,
+        messagesCount: 0,
+      });
     }
   }, [token]);
 
@@ -48,25 +57,27 @@ export default function useNavCounts() {
   }, [location.pathname, fetchCounts]);
 
   useEffect(() => {
-    if (!token) return undefined;
-
     const handleUpdate = () => fetchCounts();
     const handleVisibility = () => {
       if (!document.hidden) fetchCounts();
     };
 
     window.addEventListener("cartUpdated", handleUpdate);
-    window.addEventListener("wishlistUpdated", handleUpdate);
-    window.addEventListener("messagesUpdated", handleUpdate);
     window.addEventListener("focus", handleUpdate);
     document.addEventListener("visibilitychange", handleVisibility);
+    if (token) {
+      window.addEventListener("wishlistUpdated", handleUpdate);
+      window.addEventListener("messagesUpdated", handleUpdate);
+    }
 
     return () => {
       window.removeEventListener("cartUpdated", handleUpdate);
-      window.removeEventListener("wishlistUpdated", handleUpdate);
-      window.removeEventListener("messagesUpdated", handleUpdate);
       window.removeEventListener("focus", handleUpdate);
       document.removeEventListener("visibilitychange", handleVisibility);
+      if (token) {
+        window.removeEventListener("wishlistUpdated", handleUpdate);
+        window.removeEventListener("messagesUpdated", handleUpdate);
+      }
     };
   }, [token, fetchCounts]);
 

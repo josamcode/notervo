@@ -6,6 +6,10 @@ import Cookies from "js-cookie";
 import { showSuccess, showError } from "../utils/Toast";
 import { resolveProductImageUrl } from "../utils/imageUrl";
 import { getDiscountedPrice } from "../utils/pricing";
+import {
+    clearGuestCart,
+    getGuestCartItems,
+} from "../utils/guestCart";
 import Currency from "../components/Currency";
 
 /* ───────────────────────── tiny icon helpers ───────────────────────── */
@@ -160,6 +164,7 @@ const CheckoutPage = () => {
     const [couponOpen, setCouponOpen] = useState(false);
 
     const token = Cookies.get("token");
+    const isLoggedIn = Boolean(token);
     const navigate = useNavigate();
     const summaryRef = useRef(null);
 
@@ -185,41 +190,48 @@ const CheckoutPage = () => {
     };
 
     useEffect(() => {
-        if (!token) {
-            navigate("/login", { replace: true });
-            return;
-        }
-
         const fetchCartAndProducts = async () => {
             try {
-                const [cartRes, userRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                    axios.get(`${process.env.REACT_APP_API_URL}/me`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }).catch(() => null),
-                ]);
-                const cartData = cartRes.data.cart;
+                let rawItems = [];
+                let addresses = [];
 
-                if (!cartData || !cartData.items.length) {
+                if (isLoggedIn) {
+                    const [cartRes, userRes] = await Promise.all([
+                        axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }),
+                        axios.get(`${process.env.REACT_APP_API_URL}/me`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }).catch(() => null),
+                    ]);
+                    rawItems = cartRes?.data?.cart?.items || [];
+                    addresses = userRes?.data?.user?.shippingAddresses || [];
+                } else {
+                    rawItems = getGuestCartItems().map((item, index) => ({
+                        _id: `${item.productId}-${item.color || "no-color"}-${item.size || "no-size"}-${index}`,
+                        productId: { _id: item.productId },
+                        quantity: item.quantity,
+                        color: item.color || null,
+                        size: item.size || null,
+                    }));
+                }
+
+                if (!rawItems.length) {
                     showError("Your cart is empty.");
                     navigate("/cart");
                     return;
                 }
 
-                setCart(cartData);
-                setOrderTotal(cartData.total);
-
-                const productFetchPromises = cartData.items.map(async (item) => {
+                const productFetchPromises = rawItems.map(async (item) => {
+                    const productId = item.productId?._id || item.productId;
                     try {
                         const res = await axios.get(
-                            `${process.env.REACT_APP_API_URL}/products/${item.productId._id}`
+                            `${process.env.REACT_APP_API_URL}/products/${productId}`
                         );
-                        return [item.productId._id, res.data];
+                        return [productId, res.data];
                     } catch (err) {
-                        console.error(`Failed to load product ${item.productId._id}`, err);
-                        return [item.productId._id, null];
+                        console.error(`Failed to load product ${productId}`, err);
+                        return [productId, null];
                     }
                 });
 
@@ -227,9 +239,30 @@ const CheckoutPage = () => {
                 const detailsMap = Object.fromEntries(results.filter(([_, prod]) => prod));
                 setProductDetails(detailsMap);
 
-                const addresses = userRes?.data?.user?.shippingAddresses || [];
-                setSavedShippingAddresses(addresses);
+                const normalizedItems = rawItems.map((item, index) => {
+                    const productId = item.productId?._id || item.productId;
+                    return {
+                        _id: item._id || `${productId}-${item.color || "no-color"}-${item.size || "no-size"}-${index}`,
+                        productId: { _id: productId },
+                        quantity: item.quantity,
+                        color: item.color || null,
+                        size: item.size || null,
+                    };
+                });
 
+                const computedTotal = normalizedItems.reduce((sum, item) => {
+                    const product = detailsMap[item.productId._id];
+                    if (!product) {
+                        return sum;
+                    }
+                    const { finalPrice } = getDiscountedPrice(product);
+                    return sum + finalPrice * item.quantity;
+                }, 0);
+
+                setCart({ items: normalizedItems, total: computedTotal });
+                setOrderTotal(computedTotal);
+
+                setSavedShippingAddresses(addresses);
                 if (addresses.length > 0) {
                     const defaultIndex = addresses.findIndex((address) => address.isDefault);
                     const chosenIndex = defaultIndex >= 0 ? defaultIndex : 0;
@@ -238,8 +271,9 @@ const CheckoutPage = () => {
                     setSaveShippingAddress(false);
                     setSetAsDefaultAddress(false);
                 } else {
-                    setSaveShippingAddress(true);
-                    setSetAsDefaultAddress(true);
+                    setSelectedSavedAddressIndex(-1);
+                    setSaveShippingAddress(isLoggedIn);
+                    setSetAsDefaultAddress(isLoggedIn);
                 }
             } catch (err) {
                 console.error("Error loading cart or products:", err);
@@ -251,11 +285,11 @@ const CheckoutPage = () => {
         };
 
         fetchCartAndProducts();
-    }, [token, navigate]);
+    }, [isLoggedIn, navigate, token]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (["fullName", "phone", "city", "street", "notes"].includes(name)) {
+        if (isLoggedIn && ["fullName", "phone", "city", "street", "notes"].includes(name)) {
             setSelectedSavedAddressIndex(-1);
             setSaveShippingAddress(true);
         }
@@ -274,6 +308,11 @@ const CheckoutPage = () => {
     };
 
     const handleApplyCoupon = async () => {
+        if (!isLoggedIn) {
+            showError("Please login to apply coupons.");
+            return;
+        }
+
         if (!couponCode) {
             showError("Enter a coupon code");
             return;
@@ -303,6 +342,11 @@ const CheckoutPage = () => {
     };
 
     const handleRemoveCoupon = async () => {
+        if (!isLoggedIn) {
+            showError("Please login to manage coupons.");
+            return;
+        }
+
         setRemoving(true);
         try {
             await axios.post(
@@ -346,24 +390,35 @@ const CheckoutPage = () => {
                     street: formData.street,
                     notes: formData.notes,
                 },
-                saveShippingAddress,
-                setDefaultShippingAddress: saveShippingAddress && setAsDefaultAddress,
+                ...(isLoggedIn
+                    ? {
+                        saveShippingAddress,
+                        setDefaultShippingAddress: saveShippingAddress && setAsDefaultAddress,
+                    }
+                    : {}),
                 ...(appliedCoupon && { couponCode: appliedCoupon.couponCode }),
             };
+
+            const headers = {
+                "Content-Type": "application/json",
+            };
+            if (isLoggedIn) {
+                headers.Authorization = `Bearer ${token}`;
+            }
 
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/orders`,
                 payload,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
+                    headers,
                 }
             );
 
             if (response.data.status === "success") {
                 showSuccess("Order placed successfully!");
+                if (!isLoggedIn) {
+                    clearGuestCart();
+                }
                 window.dispatchEvent(new Event("cartUpdated"));
                 const orderIdentifier = response.data.order?.orderNumber || response.data.order?._id;
                 navigate(`/order-confirmation/${orderIdentifier}`);
@@ -543,58 +598,60 @@ const CheckoutPage = () => {
                             />
 
                             {/* Save toggles */}
-                            <div className="flex flex-col gap-2 pt-1">
-                                <label className="flex items-center gap-2.5 cursor-pointer group">
-                                    <span
-                                        className={`
-                                            flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
-                                            ${saveShippingAddress
-                                                ? "bg-primary border-primary"
-                                                : "border-gray-300 group-hover:border-gray-400"
-                                            }
-                                        `}
+                            {isLoggedIn && (
+                                <div className="flex flex-col gap-2 pt-1">
+                                    <label className="flex items-center gap-2.5 cursor-pointer group">
+                                        <span
+                                            className={`
+                                                flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
+                                                ${saveShippingAddress
+                                                    ? "bg-primary border-primary"
+                                                    : "border-gray-300 group-hover:border-gray-400"
+                                                }
+                                            `}
+                                        >
+                                            {saveShippingAddress && <CheckIcon className="w-3 h-3 text-white" />}
+                                        </span>
+                                        <input
+                                            type="checkbox"
+                                            checked={saveShippingAddress}
+                                            onChange={(e) => {
+                                                const shouldSave = e.target.checked;
+                                                setSaveShippingAddress(shouldSave);
+                                                if (!shouldSave) setSetAsDefaultAddress(false);
+                                            }}
+                                            className="sr-only"
+                                        />
+                                        <span className="text-sm text-gray-600">Save for next checkout</span>
+                                    </label>
+                                    <label
+                                        className={`flex items-center gap-2.5 cursor-pointer group ${!saveShippingAddress ? "opacity-40 pointer-events-none" : ""
+                                            }`}
                                     >
-                                        {saveShippingAddress && <CheckIcon className="w-3 h-3 text-white" />}
-                                    </span>
-                                    <input
-                                        type="checkbox"
-                                        checked={saveShippingAddress}
-                                        onChange={(e) => {
-                                            const shouldSave = e.target.checked;
-                                            setSaveShippingAddress(shouldSave);
-                                            if (!shouldSave) setSetAsDefaultAddress(false);
-                                        }}
-                                        className="sr-only"
-                                    />
-                                    <span className="text-sm text-gray-600">Save for next checkout</span>
-                                </label>
-                                <label
-                                    className={`flex items-center gap-2.5 cursor-pointer group ${!saveShippingAddress ? "opacity-40 pointer-events-none" : ""
-                                        }`}
-                                >
-                                    <span
-                                        className={`
-                                            flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
-                                            ${setAsDefaultAddress && saveShippingAddress
-                                                ? "bg-primary border-primary"
-                                                : "border-gray-300 group-hover:border-gray-400"
-                                            }
-                                        `}
-                                    >
-                                        {setAsDefaultAddress && saveShippingAddress && (
-                                            <CheckIcon className="w-3 h-3 text-white" />
-                                        )}
-                                    </span>
-                                    <input
-                                        type="checkbox"
-                                        checked={savedShippingAddresses.length > 0 ? setAsDefaultAddress : false}
-                                        disabled={!saveShippingAddress}
-                                        onChange={(e) => setSetAsDefaultAddress(e.target.checked)}
-                                        className="sr-only"
-                                    />
-                                    <span className="text-sm text-gray-600">Set as default</span>
-                                </label>
-                            </div>
+                                        <span
+                                            className={`
+                                                flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
+                                                ${setAsDefaultAddress && saveShippingAddress
+                                                    ? "bg-primary border-primary"
+                                                    : "border-gray-300 group-hover:border-gray-400"
+                                                }
+                                            `}
+                                        >
+                                            {setAsDefaultAddress && saveShippingAddress && (
+                                                <CheckIcon className="w-3 h-3 text-white" />
+                                            )}
+                                        </span>
+                                        <input
+                                            type="checkbox"
+                                            checked={savedShippingAddresses.length > 0 ? setAsDefaultAddress : false}
+                                            disabled={!saveShippingAddress}
+                                            onChange={(e) => setSetAsDefaultAddress(e.target.checked)}
+                                            className="sr-only"
+                                        />
+                                        <span className="text-sm text-gray-600">Set as default</span>
+                                    </label>
+                                </div>
+                            )}
                         </div>
                     </section>
 
@@ -733,15 +790,15 @@ const CheckoutPage = () => {
                                                 type="text"
                                                 value={couponCode}
                                                 onChange={handleCouponChange}
-                                                placeholder="Enter code"
-                                                disabled={appliedCoupon !== null}
+                                                placeholder={isLoggedIn ? "Enter code" : "Login to use coupons"}
+                                                disabled={appliedCoupon !== null || !isLoggedIn}
                                                 className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-gray-50 disabled:text-gray-400"
                                             />
                                             {!appliedCoupon ? (
                                                 <button
                                                     type="button"
                                                     onClick={handleApplyCoupon}
-                                                    disabled={applying}
+                                                    disabled={applying || !isLoggedIn}
                                                     className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-black disabled:bg-gray-300 transition-colors whitespace-nowrap"
                                                 >
                                                     {applying ? "..." : "Apply"}

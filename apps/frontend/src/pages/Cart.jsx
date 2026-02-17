@@ -4,6 +4,10 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, Link } from "react-router-dom";
 import { removeFromCart } from "../utils/CartUtils";
+import {
+    getGuestCartItems,
+    updateGuestCartItemQuantity,
+} from "../utils/guestCart";
 import { resolveProductImageUrl } from "../utils/imageUrl";
 import { getDiscountedPrice } from "../utils/pricing";
 import Currency from "../components/Currency";
@@ -66,7 +70,33 @@ export default function CartPage() {
         const fetchCart = async () => {
             try {
                 const token = Cookies.get("token");
-                if (!token) throw new Error("User not authenticated");
+                if (!token) {
+                    const guestItems = getGuestCartItems();
+                    if (!guestItems.length) {
+                        setCart({ items: [], total: 0 });
+                        return;
+                    }
+
+                    const itemsWithImages = await Promise.all(
+                        guestItems.map(async (item, index) => {
+                            const productRes = await axios.get(
+                                `${process.env.REACT_APP_API_URL}/products/${item.productId}`
+                            );
+
+                            return {
+                                _id: `${item.productId}-${item.color || "no-color"}-${item.size || "no-size"}-${index}`,
+                                productId: { _id: item.productId },
+                                quantity: item.quantity,
+                                color: item.color || null,
+                                size: item.size || null,
+                                productDetails: productRes.data,
+                            };
+                        })
+                    );
+
+                    setCart({ items: itemsWithImages, total: 0 });
+                    return;
+                }
 
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -107,11 +137,35 @@ export default function CartPage() {
         const newQuantity = item.quantity + delta;
         if (newQuantity < 1) return;
 
+        const token = Cookies.get("token");
+        if (!token) {
+            const result = updateGuestCartItemQuantity(
+                item.productId._id,
+                newQuantity,
+                item.color,
+                item.size
+            );
+
+            if (!result.success) {
+                console.error(result.message);
+                return;
+            }
+
+            setCart((prev) => ({
+                ...prev,
+                items: prev.items.map((i) =>
+                    i._id === item._id ? { ...i, quantity: newQuantity } : i
+                ),
+            }));
+            window.dispatchEvent(new Event("cartUpdated"));
+            return;
+        }
+
         try {
             await axios.put(
                 `${process.env.REACT_APP_API_URL}/cart/update/${item.productId._id}`,
                 { quantity: newQuantity, color: item.color, size: item.size },
-                { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             setCart((prev) => ({
                 ...prev,

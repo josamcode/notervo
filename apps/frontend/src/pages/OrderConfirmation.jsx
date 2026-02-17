@@ -1,5 +1,5 @@
 // src/pages/OrderConfirmation.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -17,12 +17,6 @@ const Icon = ({ children, className = "" }) => (
         className={`w-5 h-5 ${className}`}
     >
         {children}
-    </svg>
-);
-
-const CheckCircleIcon = ({ className = "" }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
     </svg>
 );
 
@@ -208,18 +202,19 @@ const OrderConfirmation = () => {
     const [confettiDone, setConfettiDone] = useState(false);
 
     const token = Cookies.get("token");
+    const isLoggedIn = Boolean(token);
 
     useEffect(() => {
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
-
         const fetchOrder = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}/orders/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const requestConfig = token
+                    ? { headers: { Authorization: `Bearer ${token}` } }
+                    : {};
+
+                const res = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/orders/${id}`,
+                    requestConfig
+                );
 
                 if (res.data.status === "success") {
                     const fetchedOrder = res.data.order;
@@ -287,10 +282,10 @@ const OrderConfirmation = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Order Not Found</h2>
                 <p className="text-gray-500 text-sm mb-6">We couldn't find this order.</p>
                 <Link
-                    to="/profile"
+                    to={isLoggedIn ? "/profile" : "/shop"}
                     className="px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-black transition-colors inline-block"
                 >
-                    View All Orders
+                    {isLoggedIn ? "View All Orders" : "Continue Shopping"}
                 </Link>
             </div>
         );
@@ -547,18 +542,20 @@ const OrderConfirmation = () => {
                         {/* Action buttons */}
                         <div className="space-y-3">
                             <Link
-                                to="/profile"
+                                to={isLoggedIn ? "/profile" : "/shop"}
                                 className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary text-white font-semibold rounded-2xl hover:bg-black transition-colors duration-200 shadow-lg shadow-primary/20 hover:shadow-black/20"
                             >
                                 <ClipboardIcon className="w-4 h-4" />
-                                View All Orders
+                                {isLoggedIn ? "View All Orders" : "Continue Shopping"}
                             </Link>
-                            <Link
-                                to="/shop"
-                                className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:border-primary hover:text-primary transition-all duration-200"
-                            >
-                                Continue Shopping
-                            </Link>
+                            {isLoggedIn && (
+                                <Link
+                                    to="/shop"
+                                    className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:border-primary hover:text-primary transition-all duration-200"
+                                >
+                                    Continue Shopping
+                                </Link>
+                            )}
                         </div>
 
                         {/* Trust footer */}

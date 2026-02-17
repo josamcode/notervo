@@ -275,7 +275,7 @@ const BottomTabBar = () => {
               >
                 <div className="relative">
                   <Ico active={active} />
-                  {isLoggedIn && count > 0 && (
+                  {count > 0 && (
                     <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] rounded-full bg-primary px-1 text-[9px] font-bold text-white flex items-center justify-center">
                       {count > 99 ? "99+" : count}
                     </span>
