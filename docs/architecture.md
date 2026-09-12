@@ -25,6 +25,6 @@ Users reference carts, wishlists, and orders. Products contain notebook variants
 
 Guest orders have no user reference. Creation returns a signed capability for retrieving that order. The browser stores it in session storage, and account authorization rejects guest capabilities. Clearing session storage loses guest access; no self-service recovery flow exists yet.
 
-Checkout checks availability and requested stock, but inventory reservation, order persistence, cart clearing, and coupon redemption are not yet one atomic transaction. Stock is not decremented by the current checkout controller. This is a launch blocker, not a completed inventory system.
+Checkout checks availability and requested stock. Inventory reservation, order persistence, cart clearing, and coupon redemption do not run as one atomic transaction, and the checkout controller does not decrement stock. Concurrent purchases therefore require an inventory reservation mechanism to prevent overselling. See [operation and maintenance](operations.md) for operational constraints.
 
 The two pricing utilities are still duplicated between browser and API. Their behavior should move to a tested shared package when a stable currency contract is introduced. Current amounts use JavaScript numbers rounded to two decimals; future payment integration should use integer minor units and explicit currency codes.

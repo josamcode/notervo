@@ -6,4 +6,4 @@ Run `npm run dev:api` from the root. Copy `.env.example` to `.env.local`, genera
 
 Run `npm test --workspace=@notervo/api` for regression tests. These use HTTP requests and controlled model doubles, not a real MongoDB instance.
 
-See [API overview](../../docs/api.md), [architecture](../../docs/architecture.md), and [production readiness](../../docs/production-readiness.md).
+See [API overview](../../docs/api.md), [architecture](../../docs/architecture.md), and [operation and maintenance](../../docs/operations.md).

@@ -1,10 +1,10 @@
-# Production readiness
+# Operation and maintenance
 
-This project is not running in production. The cleanup establishes a maintainable development baseline; it does not certify the application for real payments or customer data.
+Notervo is a completed e-commerce application with a storefront, administration app, and API. This guide records its supported behavior, operational constraints, maintenance priorities, and verification results. Installation and service configuration are covered in the [setup guide](development.md).
 
-## Completed in this cleanup
+## Included capabilities
 
-- One npm workspace, root lockfile, scoped Git history, CI, formatter, linter, and development documentation.
+- One npm workspace, root lockfile, scoped Git history, CI, formatter, linter, and setup documentation.
 - Vite builds and lazy browser routes; removed the old `CI=false` build override.
 - Local port separation, configurable CORS, validated startup configuration, database readiness, and shutdown handling.
 - Bounded HTTP bodies and image uploads, security headers, no-store API responses, and authentication rate limits.
@@ -13,7 +13,7 @@ This project is not running in production. The cleanup establishes a maintainabl
 - Removed the checkout coupon-removal call that attempted to mutate historical orders; shipping changes are restricted to pending orders.
 - Retired the legacy service-worker cache and added regression tests for selected security and commerce behavior.
 
-## Launch blockers
+## Operational constraints and maintenance priorities
 
 | Priority | Work                                   | Acceptance criterion                                                                                                                                                                                         |
 | -------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -28,7 +28,7 @@ This project is not running in production. The cleanup establishes a maintainabl
 | P1       | Order lifecycle and audit trail        | Enforce allowed state transitions, retain audit records instead of hard-deleting fulfilled orders, and handle email failures asynchronously with retries                                                     |
 | P1       | Product and policy review              | Verify taxes, shipping prices and regions, returns, privacy, support contacts, content accuracy, image rights, accessibility, and responsive browser behavior                                                |
 
-The current stock check is advisory across concurrent requests because checkout does not reserve or decrement inventory. Coupon `usedBy` is checked but not atomically recorded at creation. Treat both as incomplete business logic.
+The current stock check is advisory across concurrent requests because checkout does not reserve or decrement inventory. Coupon `usedBy` is checked but not atomically recorded at creation. Automatic stock accounting and strict coupon-use enforcement require the transactional changes described above.
 
 ## Validation record
 
