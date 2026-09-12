@@ -1,38 +1,9 @@
-# Notervo Admin Dashboard
+# Notervo administration
 
-React + Tailwind admin panel for managing Notervo notebook ecommerce operations.
+React application for catalog, orders, users, coupons, and communication management.
 
-## Features
+Run `npm run dev:admin` from the repository root. The development server uses http://localhost:3001. Configure `VITE_API_URL` in `.env.local` and create an administrator using the [development guide](../../docs/development.md).
 
-- Notebook catalog CRUD
-- Orders management and status updates
-- User and subscriber management
-- Coupons management
-- Customer/admin messaging
-- Dashboard analytics and trend charts
+Run `npm run build --workspace=@notervo/admin` to generate `dist/`. Dedicated admin browser tests remain follow-up work.
 
-## Setup
-
-```bash
-npm install
-npm start
-```
-
-Create `.env`:
-
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-REACT_APP_BASE_URL=http://localhost:5000
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-## Brand System
-
-- Primary: `#222222`
-- Secondary: `#D8D8D8`
-- Typography: Ahsing for headings, Poppins for body
+See the [root README](../../README.md) for shared commands.
