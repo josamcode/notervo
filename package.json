@@ -1,0 +1,33 @@
+{
+  "name": "notervo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Notervo notebook commerce platform: storefront, administration, and API",
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others --names api,store,admin \"npm run dev:api\" \"npm run dev:store\" \"npm run dev:admin\"",
+    "dev:api": "npm run dev --workspace=@notervo/api",
+    "dev:store": "npm run dev --workspace=@notervo/storefront",
+    "dev:admin": "npm run dev --workspace=@notervo/admin",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "test": "npm run test --workspaces --if-present",
+    "check": "npm run lint && npm test && npm run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.5.0",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2"
+  }
+}
