@@ -1,5 +1,5 @@
 // utils/emailTemplates.js
-require('dotenv').config();
+// Environment loading is centralized in config/env.js.
 
 const SECOND_BASE_URL = process.env.SECOND_BASE_URL;
 
@@ -7,22 +7,22 @@ const SECOND_BASE_URL = process.env.SECOND_BASE_URL;
    Shared design tokens — single source of truth
    ───────────────────────────────────────────────────────── */
 const brand = {
-  primary: '#222222',
-  primaryDark: '#111111',
-  surface: '#FAFAFA',
-  border: '#E8E8E8',
-  textDark: '#1A1A1A',
-  textMid: '#555555',
-  textLight: '#888888',
-  success: '#16A34A',
-  successBg: '#F0FDF4',
-  successBorder: '#BBF7D0',
-  error: '#DC2626',
-  errorBg: '#FEF2F2',
-  errorBorder: '#FECACA',
-  white: '#FFFFFF',
-  radius: '16px',
-  radiusSm: '12px',
+  primary: "#222222",
+  primaryDark: "#111111",
+  surface: "#FAFAFA",
+  border: "#E8E8E8",
+  textDark: "#1A1A1A",
+  textMid: "#555555",
+  textLight: "#888888",
+  success: "#16A34A",
+  successBg: "#F0FDF4",
+  successBorder: "#BBF7D0",
+  error: "#DC2626",
+  errorBg: "#FEF2F2",
+  errorBorder: "#FECACA",
+  white: "#FFFFFF",
+  radius: "16px",
+  radiusSm: "12px",
   year: new Date().getFullYear(),
 };
 
@@ -116,9 +116,24 @@ const buttonHTML = (text, href, bgColor = brand.primary) => `
    ───────────────────────────────────────────────────────── */
 const statusBadge = (type) => {
   const configs = {
-    success: { bg: brand.successBg, border: brand.successBorder, color: brand.success, icon: '&#10003;' },
-    error: { bg: brand.errorBg, border: brand.errorBorder, color: brand.error, icon: '&#10007;' },
-    warning: { bg: '#FFFBEB', border: '#FDE68A', color: '#D97706', icon: '&#9888;' },
+    success: {
+      bg: brand.successBg,
+      border: brand.successBorder,
+      color: brand.success,
+      icon: "&#10003;",
+    },
+    error: {
+      bg: brand.errorBg,
+      border: brand.errorBorder,
+      color: brand.error,
+      icon: "&#10007;",
+    },
+    warning: {
+      bg: "#FFFBEB",
+      border: "#FDE68A",
+      color: "#D97706",
+      icon: "&#9888;",
+    },
   };
   const c = configs[type] || configs.warning;
   return `
@@ -135,7 +150,9 @@ const statusBadge = (type) => {
    1. VERIFICATION EMAIL (sent to inbox)
    ═══════════════════════════════════════════════════════════ */
 const getVerificationEmailHTML = (username, verificationUrl) =>
-  baseLayout('Verify Your Email — Notervo', `
+  baseLayout(
+    "Verify Your Email — Notervo",
+    `
     <!-- Icon -->
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
       <tr>
@@ -152,7 +169,7 @@ const getVerificationEmailHTML = (username, verificationUrl) =>
       Hi <strong>${username}</strong>, thanks for signing up! Please confirm your email address to activate your account.
     </p>
 
-    ${buttonHTML('Verify Email Address', verificationUrl)}
+    ${buttonHTML("Verify Email Address", verificationUrl)}
 
     <!-- Fallback link -->
     <p style="margin:24px 0 0;font-size:12px;color:${brand.textLight};text-align:center;line-height:1.6;">
@@ -170,15 +187,17 @@ const getVerificationEmailHTML = (username, verificationUrl) =>
         </td>
       </tr>
     </table>
-  `);
-
+  `
+  );
 
 /* ═══════════════════════════════════════════════════════════
    2. EMAIL VERIFIED SUCCESS (browser page)
    ═══════════════════════════════════════════════════════════ */
 const getEmailVerificationSuccessHTML = (username) =>
-  baseLayout('Email Verified — Notervo', `
-    ${statusBadge('success')}
+  baseLayout(
+    "Email Verified — Notervo",
+    `
+    ${statusBadge("success")}
 
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:${brand.textDark};text-align:center;letter-spacing:-0.3px;">
       Email verified!
@@ -190,7 +209,7 @@ const getEmailVerificationSuccessHTML = (username) =>
       Your email address has been confirmed. You can now log in using your email or phone number.
     </p>
 
-    ${buttonHTML('Go to Login', `${SECOND_BASE_URL}/login`)}
+    ${buttonHTML("Go to Login", `${SECOND_BASE_URL}/login`)}
 
     <!-- Auto-redirect notice -->
     <p style="margin:20px 0 0;font-size:12px;color:${brand.textLight};text-align:center;">
@@ -202,15 +221,17 @@ const getEmailVerificationSuccessHTML = (username) =>
         window.location.href = '${SECOND_BASE_URL}/login';
       }, 5000);
     </script>
-  `);
-
+  `
+  );
 
 /* ═══════════════════════════════════════════════════════════
    3. INVALID / EXPIRED TOKEN (browser page)
    ═══════════════════════════════════════════════════════════ */
 const getInvalidTokenHTML = () =>
-  baseLayout('Verification Failed — Notervo', `
-    ${statusBadge('error')}
+  baseLayout(
+    "Verification Failed — Notervo",
+    `
+    ${statusBadge("error")}
 
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:${brand.textDark};text-align:center;letter-spacing:-0.3px;">
       Verification failed
@@ -219,20 +240,22 @@ const getInvalidTokenHTML = () =>
       This verification link is <strong style="color:${brand.error};">invalid or expired</strong>. Please check the link in your email or register for a new account.
     </p>
 
-    ${buttonHTML('Register Again', `${SECOND_BASE_URL}/register`)}
+    ${buttonHTML("Register Again", `${SECOND_BASE_URL}/register`)}
 
     <p style="margin:16px 0 0;font-size:13px;text-align:center;">
       <a href="${SECOND_BASE_URL}/login" style="color:${brand.textMid};text-decoration:underline;">Go to Login</a>
     </p>
-  `);
-
+  `
+  );
 
 /* ═══════════════════════════════════════════════════════════
    4. MISSING TOKEN (browser page)
    ═══════════════════════════════════════════════════════════ */
 const getMissingTokenHTML = () =>
-  baseLayout('Verification Error — Notervo', `
-    ${statusBadge('warning')}
+  baseLayout(
+    "Verification Error — Notervo",
+    `
+    ${statusBadge("warning")}
 
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:${brand.textDark};text-align:center;letter-spacing:-0.3px;">
       Missing verification token
@@ -241,16 +264,18 @@ const getMissingTokenHTML = () =>
       No verification token was provided. Make sure you're using the complete link from your email.
     </p>
 
-    ${buttonHTML('Go to Login', `${SECOND_BASE_URL}/login`)}
-  `);
-
+    ${buttonHTML("Go to Login", `${SECOND_BASE_URL}/login`)}
+  `
+  );
 
 /* ═══════════════════════════════════════════════════════════
    5. GENERIC ERROR (browser page)
    ═══════════════════════════════════════════════════════════ */
 const getGenericVerificationErrorHTML = () =>
-  baseLayout('Verification Error — Notervo', `
-    ${statusBadge('error')}
+  baseLayout(
+    "Verification Error — Notervo",
+    `
+    ${statusBadge("error")}
 
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:${brand.textDark};text-align:center;letter-spacing:-0.3px;">
       Something went wrong
@@ -259,13 +284,13 @@ const getGenericVerificationErrorHTML = () =>
       An error occurred during email verification. Please try again later or contact our support team.
     </p>
 
-    ${buttonHTML('Go to Login', `${SECOND_BASE_URL}/login`)}
+    ${buttonHTML("Go to Login", `${SECOND_BASE_URL}/login`)}
 
     <p style="margin:16px 0 0;font-size:13px;text-align:center;">
       <a href="${SECOND_BASE_URL}/register" style="color:${brand.textMid};text-decoration:underline;">Register again</a>
     </p>
-  `);
-
+  `
+  );
 
 module.exports = {
   getVerificationEmailHTML,

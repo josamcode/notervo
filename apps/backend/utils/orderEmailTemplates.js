@@ -4,22 +4,22 @@
    Design tokens — matches emailTemplates.js
    ───────────────────────────────────────────────────────── */
 const brand = {
-  primary: '#222222',
-  surface: '#FAFAFA',
-  surfaceAlt: '#F5F5F5',
-  border: '#E8E8E8',
-  borderLight: '#F0F0F0',
-  textDark: '#1A1A1A',
-  textMid: '#555555',
-  textLight: '#888888',
-  textFaint: '#AAAAAA',
-  white: '#FFFFFF',
-  success: '#16A34A',
-  successBg: '#F0FDF4',
-  successBorder: '#BBF7D0',
-  radius: '16px',
-  radiusSm: '12px',
-  radiusXs: '8px',
+  primary: "#222222",
+  surface: "#FAFAFA",
+  surfaceAlt: "#F5F5F5",
+  border: "#E8E8E8",
+  borderLight: "#F0F0F0",
+  textDark: "#1A1A1A",
+  textMid: "#555555",
+  textLight: "#888888",
+  textFaint: "#AAAAAA",
+  white: "#FFFFFF",
+  success: "#16A34A",
+  successBg: "#F0FDF4",
+  successBorder: "#BBF7D0",
+  radius: "16px",
+  radiusSm: "12px",
+  radiusXs: "8px",
   year: new Date().getFullYear(),
 };
 
@@ -28,33 +28,33 @@ const brand = {
    ───────────────────────────────────────────────────────── */
 const getOrderDisplayId = (order) => {
   if (order?.orderNumber) return order.orderNumber;
-  const rawId = order?._id?.toString?.() || '';
-  if (!rawId) return 'N/A';
+  const rawId = order?._id?.toString?.() || "";
+  if (!rawId) return "N/A";
   return `NTV-${rawId.slice(-6).toUpperCase()}`;
 };
 
 const capitalizeState = (value) => {
-  if (!value || typeof value !== 'string') return 'N/A';
+  if (!value || typeof value !== "string") return "N/A";
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
 const formatDate = (date) => {
   try {
-    return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(date).toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   } catch {
-    return 'N/A';
+    return "N/A";
   }
 };
 
 const formatPrice = (num) => {
-  if (typeof num !== 'number') return '0.00';
+  if (typeof num !== "number") return "0.00";
   return num.toFixed(2);
 };
 
@@ -76,7 +76,7 @@ const baseLayout = (title, headerTitle, headerSubtitle, body, footerNote) => `
 <body style="margin:0;padding:0;background-color:${brand.surface};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;">
 
   <div style="display:none;font-size:1px;color:${brand.surface};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
-    ${headerSubtitle.replace(/<[^>]*>/g, '')}
+    ${headerSubtitle.replace(/<[^>]*>/g, "")}
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${brand.surface};">
@@ -111,7 +111,9 @@ const baseLayout = (title, headerTitle, headerSubtitle, body, footerNote) => `
           <tr>
             <td style="background-color:${brand.surfaceAlt};padding:24px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                ${footerNote ? `
+                ${
+                  footerNote
+                    ? `
                 <tr>
                   <td style="text-align:center;padding-bottom:14px;">
                     <p style="margin:0;font-size:12px;color:${brand.textMid};line-height:1.5;">
@@ -119,9 +121,11 @@ const baseLayout = (title, headerTitle, headerSubtitle, body, footerNote) => `
                     </p>
                   </td>
                 </tr>
-                ` : ''}
+                `
+                    : ""
+                }
                 <tr>
-                  <td style="text-align:center;${footerNote ? `border-top:1px solid ${brand.border};padding-top:14px;` : ''}">
+                  <td style="text-align:center;${footerNote ? `border-top:1px solid ${brand.border};padding-top:14px;` : ""}">
                     <span style="font-size:13px;font-weight:800;color:${brand.textLight};letter-spacing:1px;">NOTERVO</span>
                     <p style="margin:4px 0 0;font-size:10px;color:${brand.textFaint};">
                       &copy; ${brand.year} Notervo. All rights reserved.
@@ -143,11 +147,11 @@ const baseLayout = (title, headerTitle, headerSubtitle, body, footerNote) => `
 /* ─────────────────────────────────────────────────────────
    Section heading
    ───────────────────────────────────────────────────────── */
-const sectionHeading = (text, icon = '') => `
+const sectionHeading = (text, icon = "") => `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
   <tr>
     <td style="font-size:14px;font-weight:700;color:${brand.textDark};letter-spacing:-0.2px;border-bottom:2px solid ${brand.borderLight};padding-bottom:8px;">
-      ${icon ? `<span style="margin-right:6px;">${icon}</span>` : ''}${text}
+      ${icon ? `<span style="margin-right:6px;">${icon}</span>` : ""}${text}
     </td>
   </tr>
 </table>`;
@@ -182,7 +186,8 @@ const itemsTable = (items) => `
     .map((item, i) => {
       const originalPrice = Number(item.originalPrice);
       const finalPrice = Number(item.price);
-      const showOriginal = Number.isFinite(originalPrice) && originalPrice > finalPrice;
+      const showOriginal =
+        Number.isFinite(originalPrice) && originalPrice > finalPrice;
 
       const priceCell = showOriginal
         ? `
@@ -208,12 +213,13 @@ const itemsTable = (items) => `
 
       return `
         <tr>
-          <td style="padding:12px;font-size:13px;color:${brand.textDark};border-bottom:1px solid ${brand.borderLight};${i === 0 ? 'border-top:none;' : ''}">
+          <td style="padding:12px;font-size:13px;color:${brand.textDark};border-bottom:1px solid ${brand.borderLight};${i === 0 ? "border-top:none;" : ""}">
             <strong>${item.name}</strong>
-            ${item.color || item.size
-          ? `<br><span style="font-size:11px;color:${brand.textLight};">${item.color ? item.color : ''}${item.color && item.size ? ' &middot; ' : ''}${item.size ? item.size : ''}</span>`
-          : ''
-        }
+            ${
+              item.color || item.size
+                ? `<br><span style="font-size:11px;color:${brand.textLight};">${item.color ? item.color : ""}${item.color && item.size ? " &middot; " : ""}${item.size ? item.size : ""}</span>`
+                : ""
+            }
           </td>
           <td style="padding:12px;font-size:13px;color:${brand.textMid};border-bottom:1px solid ${brand.borderLight};text-align:center;">
             &times;${item.quantity}
@@ -227,7 +233,7 @@ const itemsTable = (items) => `
         </tr>
       `;
     })
-    .join('')}
+    .join("")}
 </table>`;
 
 /* ─────────────────────────────────────────────────────────
@@ -235,7 +241,9 @@ const itemsTable = (items) => `
    ───────────────────────────────────────────────────────── */
 const totalsBlock = (savedOrder, finalCoupon, discountValue) => `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:4px;">
-  ${finalCoupon ? `
+  ${
+    finalCoupon
+      ? `
   <tr>
     <td style="padding:8px 12px;font-size:13px;color:${brand.textMid};text-align:right;">
       Discount <span style="background-color:${brand.surfaceAlt};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;color:${brand.textDark};margin-left:4px;">${finalCoupon}</span>
@@ -243,7 +251,9 @@ const totalsBlock = (savedOrder, finalCoupon, discountValue) => `
     <td style="padding:8px 12px;font-size:13px;color:#DC2626;font-weight:600;text-align:right;width:100px;">
       -${formatPrice(discountValue)} EGP
     </td>
-  </tr>` : ''}
+  </tr>`
+      : ""
+  }
   <tr>
     <td style="padding:8px 12px;font-size:13px;color:${brand.textLight};text-align:right;">
       Shipping
@@ -270,7 +280,12 @@ const totalsBlock = (savedOrder, finalCoupon, discountValue) => `
 /* ═══════════════════════════════════════════════════════════
    1. ORDER CONFIRMATION — sent to customer
    ═══════════════════════════════════════════════════════════ */
-const getOrderConfirmationHTML = (user, savedOrder, finalCoupon, discountValue) => {
+const getOrderConfirmationHTML = (
+  user,
+  savedOrder,
+  finalCoupon,
+  discountValue
+) => {
   const orderId = getOrderDisplayId(savedOrder);
   const address = savedOrder.shippingAddress || {};
 
@@ -293,17 +308,17 @@ const getOrderConfirmationHTML = (user, savedOrder, finalCoupon, discountValue) 
       <tr>
         <td style="padding:18px 20px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            ${infoRow('Order ID', `<span style="font-family:monospace;letter-spacing:0.5px;">${orderId}</span>`)}
-            ${infoRow('Date', formatDate(savedOrder.createdAt))}
-            ${infoRow('Payment', 'Cash on delivery')}
-            ${infoRow('Ship to', `${address.street || ''}${address.city ? `, ${address.city}` : ''}${address.country ? `, ${address.country}` : ''}`)}
+            ${infoRow("Order ID", `<span style="font-family:monospace;letter-spacing:0.5px;">${orderId}</span>`)}
+            ${infoRow("Date", formatDate(savedOrder.createdAt))}
+            ${infoRow("Payment", "Cash on delivery")}
+            ${infoRow("Ship to", `${address.street || ""}${address.city ? `, ${address.city}` : ""}${address.country ? `, ${address.country}` : ""}`)}
           </table>
         </td>
       </tr>
     </table>
 
     <!-- Items -->
-    ${sectionHeading('Order Items', '&#128230;')}
+    ${sectionHeading("Order Items", "&#128230;")}
     ${itemsTable(savedOrder.items)}
     ${totalsBlock(savedOrder, finalCoupon, discountValue)}
 
@@ -323,18 +338,23 @@ const getOrderConfirmationHTML = (user, savedOrder, finalCoupon, discountValue) 
   `;
 
   return baseLayout(
-    'Order Confirmed — Notervo',
-    'Order Confirmed',
+    "Order Confirmed — Notervo",
+    "Order Confirmed",
     `Order #${orderId}`,
     body,
-    'If you have any questions about your order, reply to this email and we will help.'
+    "If you have any questions about your order, reply to this email and we will help."
   );
 };
 
 /* ═══════════════════════════════════════════════════════════
    2. NEW ORDER NOTIFICATION — sent to admin
    ═══════════════════════════════════════════════════════════ */
-const getNewOrderNotificationHTML = (user, savedOrder, finalCoupon, discountValue) => {
+const getNewOrderNotificationHTML = (
+  user,
+  savedOrder,
+  finalCoupon,
+  discountValue
+) => {
   const orderId = getOrderDisplayId(savedOrder);
   const address = savedOrder.shippingAddress || {};
 
@@ -351,46 +371,46 @@ const getNewOrderNotificationHTML = (user, savedOrder, finalCoupon, discountValu
     </table>
 
     <!-- Customer info -->
-    ${sectionHeading('Customer Information', '&#128100;')}
+    ${sectionHeading("Customer Information", "&#128100;")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${brand.surfaceAlt};border-radius:${brand.radiusSm};margin-bottom:24px;">
       <tr>
         <td style="padding:16px 20px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            ${infoRow('Name', user.username)}
-            ${infoRow('Email', user.email || 'Not provided')}
-            ${infoRow('Phone', user.phone || 'Not provided')}
+            ${infoRow("Name", user.username)}
+            ${infoRow("Email", user.email || "Not provided")}
+            ${infoRow("Phone", user.phone || "Not provided")}
           </table>
         </td>
       </tr>
     </table>
 
     <!-- Order info -->
-    ${sectionHeading('Order Details', '&#128203;')}
+    ${sectionHeading("Order Details", "&#128203;")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${brand.surfaceAlt};border-radius:${brand.radiusSm};margin-bottom:24px;">
       <tr>
         <td style="padding:16px 20px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            ${infoRow('Order ID', `<span style="font-family:monospace;letter-spacing:0.5px;">${orderId}</span>`)}
-            ${infoRow('Date', formatDate(savedOrder.createdAt))}
-            ${infoRow('Payment', 'Cash on delivery')}
-            ${infoRow('Address', `${address.street || ''}${address.city ? `, ${address.city}` : ''}${address.country ? `, ${address.country}` : ''}`)}
+            ${infoRow("Order ID", `<span style="font-family:monospace;letter-spacing:0.5px;">${orderId}</span>`)}
+            ${infoRow("Date", formatDate(savedOrder.createdAt))}
+            ${infoRow("Payment", "Cash on delivery")}
+            ${infoRow("Address", `${address.street || ""}${address.city ? `, ${address.city}` : ""}${address.country ? `, ${address.country}` : ""}`)}
           </table>
         </td>
       </tr>
     </table>
 
     <!-- Items -->
-    ${sectionHeading('Items Ordered', '&#128230;')}
+    ${sectionHeading("Items Ordered", "&#128230;")}
     ${itemsTable(savedOrder.items)}
     ${totalsBlock(savedOrder, finalCoupon, discountValue)}
   `;
 
   return baseLayout(
-    'New Order — Notervo Admin',
-    'New Order Received',
+    "New Order — Notervo Admin",
+    "New Order Received",
     `Order #${orderId} &middot; ${user.username}`,
     body,
-    'Please process this order as soon as possible.'
+    "Please process this order as soon as possible."
   );
 };
 
@@ -398,40 +418,95 @@ const getNewOrderNotificationHTML = (user, savedOrder, finalCoupon, discountValu
    3. ORDER STATUS UPDATE — sent to customer
    ═══════════════════════════════════════════════════════════ */
 const stateConfig = {
-  pending: { heading: 'Order Received', icon: '&#128230;', accent: '#4F46E5', accentBg: '#EEF2FF', accentBorder: '#C7D2FE', intro: 'We have received your order and it is waiting for processing.', message: 'Our team will review your order shortly and move it to processing as soon as possible.', step: 1 },
-  processing: { heading: 'Order In Processing', icon: '&#9881;', accent: '#D97706', accentBg: '#FFFBEB', accentBorder: '#FDE68A', intro: 'Your order is now being prepared.', message: 'We are currently picking and packing your items. We will notify you once it ships.', step: 2 },
-  shipped: { heading: 'Order Shipped', icon: '&#128666;', accent: '#0284C7', accentBg: '#F0F9FF', accentBorder: '#BAE6FD', intro: 'Great news — your order is on the way!', message: 'Your package has left our facility and is heading to your shipping address.', step: 3 },
-  delivered: { heading: 'Order Delivered', icon: '&#10003;', accent: '#16A34A', accentBg: '#F0FDF4', accentBorder: '#BBF7D0', intro: 'Your order has been delivered.', message: 'We hope you enjoy your purchase! If anything is wrong, contact us and we will help.', step: 4 },
-  cancelled: { heading: 'Order Cancelled', icon: '&#10007;', accent: '#DC2626', accentBg: '#FEF2F2', accentBorder: '#FECACA', intro: 'Your order has been cancelled.', message: 'If this cancellation was unexpected or you need help placing a new order, contact us.', step: 0 },
+  pending: {
+    heading: "Order Received",
+    icon: "&#128230;",
+    accent: "#4F46E5",
+    accentBg: "#EEF2FF",
+    accentBorder: "#C7D2FE",
+    intro: "We have received your order and it is waiting for processing.",
+    message:
+      "Our team will review your order shortly and move it to processing as soon as possible.",
+    step: 1,
+  },
+  processing: {
+    heading: "Order In Processing",
+    icon: "&#9881;",
+    accent: "#D97706",
+    accentBg: "#FFFBEB",
+    accentBorder: "#FDE68A",
+    intro: "Your order is now being prepared.",
+    message:
+      "We are currently picking and packing your items. We will notify you once it ships.",
+    step: 2,
+  },
+  shipped: {
+    heading: "Order Shipped",
+    icon: "&#128666;",
+    accent: "#0284C7",
+    accentBg: "#F0F9FF",
+    accentBorder: "#BAE6FD",
+    intro: "Great news — your order is on the way!",
+    message:
+      "Your package has left our facility and is heading to your shipping address.",
+    step: 3,
+  },
+  delivered: {
+    heading: "Order Delivered",
+    icon: "&#10003;",
+    accent: "#16A34A",
+    accentBg: "#F0FDF4",
+    accentBorder: "#BBF7D0",
+    intro: "Your order has been delivered.",
+    message:
+      "We hope you enjoy your purchase! If anything is wrong, contact us and we will help.",
+    step: 4,
+  },
+  cancelled: {
+    heading: "Order Cancelled",
+    icon: "&#10007;",
+    accent: "#DC2626",
+    accentBg: "#FEF2F2",
+    accentBorder: "#FECACA",
+    intro: "Your order has been cancelled.",
+    message:
+      "If this cancellation was unexpected or you need help placing a new order, contact us.",
+    step: 0,
+  },
 };
 
 const buildProgressTracker = (currentStep) => {
-  if (currentStep === 0) return ''; // cancelled — no tracker
+  if (currentStep === 0) return ""; // cancelled — no tracker
 
   const steps = [
-    { label: 'Received', num: 1 },
-    { label: 'Processing', num: 2 },
-    { label: 'Shipped', num: 3 },
-    { label: 'Delivered', num: 4 },
+    { label: "Received", num: 1 },
+    { label: "Processing", num: 2 },
+    { label: "Shipped", num: 3 },
+    { label: "Delivered", num: 4 },
   ];
 
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
     <tr>
-      ${steps.map((s, i) => {
-    const done = s.num <= currentStep;
-    const active = s.num === currentStep;
-    const dotColor = done ? brand.success : brand.border;
-    const labelColor = active ? brand.success : done ? brand.textMid : brand.textFaint;
-    const labelWeight = active ? '700' : '400';
+      ${steps
+        .map((s, i) => {
+          const done = s.num <= currentStep;
+          const active = s.num === currentStep;
+          const dotColor = done ? brand.success : brand.border;
+          const labelColor = active
+            ? brand.success
+            : done
+              ? brand.textMid
+              : brand.textFaint;
+          const labelWeight = active ? "700" : "400";
 
-    return `
+          return `
         <td style="text-align:center;width:25%;vertical-align:top;">
           <!-- Dot -->
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
             <tr>
               <td style="width:28px;height:28px;border-radius:50%;background-color:${done ? brand.successBg : brand.surfaceAlt};border:2px solid ${dotColor};text-align:center;vertical-align:middle;font-size:12px;color:${dotColor};line-height:24px;font-weight:700;">
-                ${done ? '&#10003;' : s.num}
+                ${done ? "&#10003;" : s.num}
               </td>
             </tr>
           </table>
@@ -439,11 +514,16 @@ const buildProgressTracker = (currentStep) => {
             ${s.label}
           </p>
         </td>
-        ${i < steps.length - 1 ? `
+        ${
+          i < steps.length - 1
+            ? `
         <td style="vertical-align:top;padding-top:14px;width:0;">
           <div style="height:2px;background-color:${s.num < currentStep ? brand.success : brand.border};margin:0 -8px;"></div>
-        </td>` : ''}`;
-  }).join('')}
+        </td>`
+            : ""
+        }`;
+        })
+        .join("")}
     </tr>
   </table>`;
 };
@@ -506,10 +586,14 @@ const buildStatusCta = (displayOrderId, state, cfg) => {
     process.env.APP_URL ||
     "";
   const orderPath = clientUrl ? `${clientUrl.replace(/\/$/, "")}/orders` : "#";
-  const supportEmail = process.env.SUPPORT_EMAIL || process.env.EMAIL_USER || "";
-  const supportHref = supportEmail ? `mailto:${supportEmail}?subject=Support%20for%20Order%20${displayOrderId}` : "#";
+  const supportEmail =
+    process.env.SUPPORT_EMAIL || process.env.EMAIL_USER || "";
+  const supportHref = supportEmail
+    ? `mailto:${supportEmail}?subject=Support%20for%20Order%20${displayOrderId}`
+    : "#";
 
-  const primaryLabel = state === "cancelled" ? "Create New Order" : "View My Orders";
+  const primaryLabel =
+    state === "cancelled" ? "Create New Order" : "View My Orders";
   const secondaryLabel = "Contact Support";
 
   return `
@@ -544,7 +628,16 @@ const buildStatusCta = (displayOrderId, state, cfg) => {
 };
 
 const getOrderStatusEmailTemplate = (user, order, previousState, state) => {
-  const fallback = { heading: 'Order Status Updated', icon: '&#128196;', accent: brand.primary, accentBg: brand.surfaceAlt, accentBorder: brand.border, intro: 'Your order status has changed.', message: 'We will keep you updated on further changes.', step: 0 };
+  const fallback = {
+    heading: "Order Status Updated",
+    icon: "&#128196;",
+    accent: brand.primary,
+    accentBg: brand.surfaceAlt,
+    accentBorder: brand.border,
+    intro: "Your order status has changed.",
+    message: "We will keep you updated on further changes.",
+    step: 0,
+  };
   const cfg = stateConfig[state] || fallback;
   const displayOrderId = getOrderDisplayId(order);
   const readablePrev = capitalizeState(previousState);
@@ -575,7 +668,7 @@ const getOrderStatusEmailTemplate = (user, order, previousState, state) => {
       <tr>
         <td style="padding:16px 20px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            ${infoRow('Order ID', `<span style="font-family:monospace;letter-spacing:0.5px;">${displayOrderId}</span>`)}
+            ${infoRow("Order ID", `<span style="font-family:monospace;letter-spacing:0.5px;">${displayOrderId}</span>`)}
           </table>
         </td>
       </tr>
@@ -597,9 +690,9 @@ const getOrderStatusEmailTemplate = (user, order, previousState, state) => {
       cfg.heading,
       `Order #${displayOrderId}`,
       body,
-      state === 'delivered'
-        ? 'Thank you for choosing Notervo! We hope you love your notebooks.'
-        : 'If you have any questions, reply to this email and we will help.'
+      state === "delivered"
+        ? "Thank you for choosing Notervo! We hope you love your notebooks."
+        : "If you have any questions, reply to this email and we will help."
     ),
   };
 };

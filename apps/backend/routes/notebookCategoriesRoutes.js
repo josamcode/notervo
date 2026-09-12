@@ -13,8 +13,20 @@ const {
 router.get("/", getNotebookCategories);
 router.get("/:id", getNotebookCategoryById);
 
-router.post("/", verifyToken, isAdmin, upload.single("image"), createNotebookCategory);
-router.put("/:id", verifyToken, isAdmin, upload.single("image"), updateNotebookCategory);
+router.post(
+  "/",
+  verifyToken,
+  isAdmin,
+  upload.single("image"),
+  createNotebookCategory
+);
+router.put(
+  "/:id",
+  verifyToken,
+  isAdmin,
+  upload.single("image"),
+  updateNotebookCategory
+);
 router.delete("/:id", verifyToken, isAdmin, deleteNotebookCategory);
 
 module.exports = router;

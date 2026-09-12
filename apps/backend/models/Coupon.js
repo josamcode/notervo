@@ -16,6 +16,7 @@ const couponSchema = new mongoose.Schema({
   value: {
     type: Number,
     required: true,
+    min: 0,
   },
   expiresAt: {
     type: Date,
@@ -30,6 +31,7 @@ const couponSchema = new mongoose.Schema({
   minCartValue: {
     type: Number,
     default: 0,
+    min: 0,
   },
 });
 

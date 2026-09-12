@@ -56,6 +56,8 @@ const ordersSchema = new mongoose.Schema(
         quantity: {
           type: Number,
           default: 1,
+          min: 1,
+          validate: Number.isInteger,
         },
         color: {
           type: String,
@@ -99,7 +101,6 @@ ordersSchema.pre("validate", async function (next) {
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const candidate = generateOrderNumber();
     // Retry on collisions to keep IDs short and unique.
-    // eslint-disable-next-line no-await-in-loop
     const existing = await OrderModel.exists({ orderNumber: candidate });
     if (!existing) {
       this.orderNumber = candidate;

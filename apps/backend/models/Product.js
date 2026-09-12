@@ -15,12 +15,14 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     // Discount details
     discount: {
       type: Number,
       default: 0,
+      min: 0,
     },
     discountType: {
       type: String,
@@ -64,6 +66,8 @@ const productSchema = new mongoose.Schema(
     stockQuantity: {
       type: Number, // Useful for quantity-based stock tracking
       default: 0,
+      min: 0,
+      validate: Number.isInteger,
     },
 
     // Brand or notebook line
@@ -82,6 +86,7 @@ const productSchema = new mongoose.Schema(
     numReviews: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     // Product visibility (can hide without deleting)

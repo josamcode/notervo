@@ -65,7 +65,9 @@ exports.deleteMessage = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    res.status(200).json({ success: true, message: "Message deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Message deleted successfully" });
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({ message: "Invalid message ID" });

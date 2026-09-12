@@ -7,10 +7,7 @@ const {
 const NOTEBOOK_CATEGORY_CLOUDINARY_FOLDER = "notervo/notebook-categories";
 
 function normalizeCategoryKey(rawValue = "") {
-  return String(rawValue)
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "-");
+  return String(rawValue).trim().toLowerCase().replace(/\s+/g, "-");
 }
 
 function buildPayload(body = {}) {

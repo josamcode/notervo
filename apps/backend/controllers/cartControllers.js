@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
-const Coupon = require("../models/Coupon");
 const Cart = require("../models/Cart");
 const { getDiscountedPrice } = require("../utils/pricing");
 
@@ -74,7 +73,7 @@ exports.addToCart = async (req, res) => {
         i.size === size
     );
 
-    if (quantity > 0) {
+    if (Number.isInteger(quantity) && quantity > 0 && quantity <= 999) {
       if (existing) {
         return res
           .status(400)
@@ -139,7 +138,12 @@ exports.updateProductQuantity = async (req, res) => {
     const { quantity, color = null, size = null } = req.body || {};
     const { id: productId } = req.params;
 
-    if (!productId || typeof quantity !== "number" || quantity < 1) {
+    if (
+      !productId ||
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 999
+    ) {
       return res.status(400).json({ message: "Invalid data" });
     }
 

@@ -5,13 +5,17 @@ const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
 const Orders = require("../models/Orders");
 const Cart = require("../models/Cart");
-const transporter = require('../config/emailService'); // Import transporter
+const transporter = require("../config/emailService"); // Import transporter
 const { getDiscountedPrice } = require("../utils/pricing");
+const {
+  createGuestOrderToken,
+  canReadGuestOrder,
+} = require("../utils/orderAccess");
 const {
   getOrderConfirmationHTML,
   getNewOrderNotificationHTML,
-  getOrderStatusEmailTemplate
-} = require('../utils/orderEmailTemplates'); // Import email templates
+  getOrderStatusEmailTemplate,
+} = require("../utils/orderEmailTemplates"); // Import email templates
 
 function calculateOrderTotal(items) {
   return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -69,25 +73,23 @@ function sanitizeShippingAddress(address = {}) {
 
 function isShippingAddressComplete(address) {
   return Boolean(
-    address.fullName &&
-      address.phone &&
-      address.city &&
-      address.street
+    address.fullName && address.phone && address.city && address.street
   );
 }
 
 function getAddressIdentity(address) {
-  return [
-    address.fullName,
-    address.phone,
-    address.city,
-    address.street,
-  ]
-    .map((value) => sanitizeAddressValue(value).toLowerCase().replace(/\s+/g, " "))
+  return [address.fullName, address.phone, address.city, address.street]
+    .map((value) =>
+      sanitizeAddressValue(value).toLowerCase().replace(/\s+/g, " ")
+    )
     .join("|");
 }
 
-function upsertUserShippingAddress(user, shippingAddress, setAsDefault = false) {
+function upsertUserShippingAddress(
+  user,
+  shippingAddress,
+  setAsDefault = false
+) {
   if (!Array.isArray(user.shippingAddresses)) {
     user.shippingAddresses = [];
   }
@@ -116,11 +118,11 @@ function upsertUserShippingAddress(user, shippingAddress, setAsDefault = false) 
     selectedIndex = user.shippingAddresses.length - 1;
   }
 
-  const hasDefaultAddress = user.shippingAddresses.some((addressDoc) => addressDoc.isDefault);
+  const hasDefaultAddress = user.shippingAddresses.some(
+    (addressDoc) => addressDoc.isDefault
+  );
   const shouldSetDefault =
-    setAsDefault ||
-    !hasDefaultAddress ||
-    user.shippingAddresses.length === 1;
+    setAsDefault || !hasDefaultAddress || user.shippingAddresses.length === 1;
 
   if (shouldSetDefault) {
     user.shippingAddresses.forEach((addressDoc, index) => {
@@ -159,6 +161,12 @@ exports.createOrder = async (req, res) => {
       });
     }
 
+    const requestedQuantities = new Map();
+    for (const item of items)
+      requestedQuantities.set(
+        item.productId,
+        (requestedQuantities.get(item.productId) || 0) + item.quantity
+      );
     const snapshotItems = [];
     for (const item of items) {
       const product = await Product.findById(item.productId);
@@ -168,6 +176,22 @@ exports.createOrder = async (req, res) => {
           productId: item.productId,
         });
       }
+      if (
+        !product.isActive ||
+        !product.inStock ||
+        product.stockQuantity < requestedQuantities.get(item.productId)
+      )
+        return res.status(409).json({
+          message: "A product is no longer available",
+          productId: item.productId,
+        });
+      if (
+        (product.colors.length && !product.colors.includes(item.color)) ||
+        (product.sizes.length && !product.sizes.includes(item.size))
+      )
+        return res.status(400).json({
+          message: "Please select an available product size and color",
+        });
       const { originalPrice, finalPrice } = getDiscountedPrice(product);
       snapshotItems.push({
         productId: product._id,
@@ -235,7 +259,8 @@ exports.createOrder = async (req, res) => {
       const shouldPersistShippingAddress =
         saveShippingAddress === true || saveShippingAddress === "true";
       const shouldSetDefaultAddress =
-        setDefaultShippingAddress === true || setDefaultShippingAddress === "true";
+        setDefaultShippingAddress === true ||
+        setDefaultShippingAddress === "true";
 
       if (shouldPersistShippingAddress) {
         const addressWasSaved = upsertUserShippingAddress(
@@ -278,37 +303,57 @@ exports.createOrder = async (req, res) => {
 
       if (customerProfile.email) {
         const userMailOptions = {
-          from: process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
+          from:
+            process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
           to: customerProfile.email,
           subject: `Order Confirmation #${displayOrderId}`,
-          html: getOrderConfirmationHTML(customerProfile, savedOrder, finalCoupon, discountValue),
+          html: getOrderConfirmationHTML(
+            customerProfile,
+            savedOrder,
+            finalCoupon,
+            discountValue
+          ),
         };
         await transporter.sendMail(userMailOptions);
-        console.log(`Order confirmation email sent to user: ${customerProfile.email}`);
+        console.log(
+          `Order confirmation email sent to user: ${customerProfile.email}`
+        );
       } else {
-        console.warn(`Order ${displayOrderId} has no customer email. Confirmation email was not sent.`);
+        console.warn(
+          `Order ${displayOrderId} has no customer email. Confirmation email was not sent.`
+        );
       }
 
       const ownerMailOptions = {
         from: process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_USER,
         subject: `New Order Received #${displayOrderId}`,
-        html: getNewOrderNotificationHTML(customerProfile, savedOrder, finalCoupon, discountValue),
+        html: getNewOrderNotificationHTML(
+          customerProfile,
+          savedOrder,
+          finalCoupon,
+          discountValue
+        ),
       };
       await transporter.sendMail(ownerMailOptions);
-      console.log(`New order notification email sent to owner: ${process.env.EMAIL_USER}`);
+      console.log(
+        `New order notification email sent to owner: ${process.env.EMAIL_USER}`
+      );
     } catch (emailError) {
       console.error("Error sending order confirmation emails:", emailError);
     }
 
     res.status(201).json({
       status: "success",
-      message: "Order created successfully. Confirmation emails sent.",
+      message: "Order created successfully.",
       order: savedOrder,
+      ...(!user && { guestAccessToken: createGuestOrderToken(savedOrder._id) }),
     });
   } catch (err) {
     console.error("Error creating order:", err);
-    res.status(500).json({ message: "Failed to create order", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to create order", error: err.message });
   }
 };
 
@@ -321,9 +366,12 @@ exports.getOrders = async (req, res) => {
     await Promise.all(orders.map((orderDoc) => ensureOrderNumber(orderDoc)));
 
     if (!orders.length) {
-      return res
-        .status(200)
-        .json({ status: "empty", length: 0, orders: [], message: "You have no orders yet." });
+      return res.status(200).json({
+        status: "empty",
+        length: 0,
+        orders: [],
+        message: "You have no orders yet.",
+      });
     }
     res.json({ status: "success", length: orders.length, orders });
   } catch (err) {
@@ -338,8 +386,8 @@ exports.getAllOrders = async (req, res) => {
       limit = 10,
       status,
       userId,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     const filter = {};
@@ -351,14 +399,14 @@ exports.getAllOrders = async (req, res) => {
     }
 
     const sort = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    sort[sortBy] = sortOrder === "asc" ? 1 : -1;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const orders = await Orders.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit))
-      .populate('userId', 'username phone');
+      .populate("userId", "username phone");
 
     await Promise.all(orders.map((orderDoc) => ensureOrderNumber(orderDoc)));
 
@@ -370,11 +418,13 @@ exports.getAllOrders = async (req, res) => {
       total,
       page: parseInt(page),
       totalPages: Math.ceil(total / parseInt(limit)),
-      orders
+      orders,
     });
   } catch (err) {
     console.error("Error in getAllOrders:", err);
-    res.status(500).json({ message: "Failed to fetch orders", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch orders", error: err.message });
   }
 };
 
@@ -382,7 +432,9 @@ exports.getOrderById = async (req, res) => {
   try {
     const orderIdentifier = (req.params.id || "").trim();
     if (!orderIdentifier) {
-      return res.status(400).json({ status: "invalid_id", message: "Order ID is required." });
+      return res
+        .status(400)
+        .json({ status: "invalid_id", message: "Order ID is required." });
     }
 
     const lookupFilters = [{ orderNumber: orderIdentifier.toUpperCase() }];
@@ -402,6 +454,14 @@ exports.getOrderById = async (req, res) => {
     const requester = req.user || null;
     const isAdmin = requester?.role === "admin";
     const orderOwnerId = order.userId ? order.userId.toString() : null;
+    if (
+      !orderOwnerId &&
+      !isAdmin &&
+      !canReadGuestOrder(req.get("X-Order-Token"), order._id)
+    )
+      return res
+        .status(403)
+        .json({ message: "A valid guest order access token is required." });
 
     if (orderOwnerId) {
       if (!requester) {
@@ -445,7 +505,16 @@ exports.updateShipping = async (req, res) => {
         .json({ message: "You are not allowed to edit this order" });
     }
 
-    order.shippingAddress = shippingAddress;
+    if (order.state !== "pending")
+      return res.status(409).json({
+        message: "Shipping can only be edited while an order is pending",
+      });
+    const normalized = sanitizeShippingAddress(shippingAddress || {});
+    if (!isShippingAddressComplete(normalized))
+      return res
+        .status(400)
+        .json({ message: "Shipping address is incomplete" });
+    order.shippingAddress = normalized;
     await order.save();
 
     res.json({ message: "Shipping address updated", order });
@@ -470,7 +539,10 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid order state" });
     }
 
-    const order = await Orders.findById(orderId).populate('userId', 'username email phone');
+    const order = await Orders.findById(orderId).populate(
+      "userId",
+      "username email phone"
+    );
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     const previousState = order.state;
@@ -481,17 +553,27 @@ exports.updateOrderStatus = async (req, res) => {
     try {
       const user = order.userId;
       if (user && user.email) {
-        const statusEmail = getOrderStatusEmailTemplate(user, order, previousState, state);
+        const statusEmail = getOrderStatusEmailTemplate(
+          user,
+          order,
+          previousState,
+          state
+        );
         const statusMailOptions = {
-          from: process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
+          from:
+            process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
           to: user.email,
           subject: statusEmail.subject,
           html: statusEmail.html,
         };
         await transporter.sendMail(statusMailOptions);
-        console.log(`Order status update email sent to user: ${user.email} for order ${displayOrderId}`);
+        console.log(
+          `Order status update email sent to user: ${user.email} for order ${displayOrderId}`
+        );
       } else {
-        console.warn(`Could not send status update email for order ${displayOrderId}. User email not found.`);
+        console.warn(
+          `Could not send status update email for order ${displayOrderId}. User email not found.`
+        );
       }
     } catch (emailError) {
       console.error("Error sending order status update email:", emailError);
@@ -503,7 +585,9 @@ exports.updateOrderStatus = async (req, res) => {
     });
   } catch (err) {
     console.error("Error updating order status:", err);
-    res.status(500).json({ message: "Failed to update order status", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update order status", error: err.message });
   }
 };
 
@@ -531,7 +615,11 @@ exports.deleteOrder = async (req, res) => {
 exports.applyCoupon = async (req, res) => {
   try {
     const { couponCode } = req.body;
-    if (!couponCode) {
+    if (
+      typeof couponCode !== "string" ||
+      !couponCode.trim() ||
+      couponCode.length > 64
+    ) {
       return res.status(400).json({ message: "Coupon code is required" });
     }
 
@@ -595,46 +683,9 @@ exports.applyCoupon = async (req, res) => {
   }
 };
 
-exports.removeCouponFromOrders = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    // Note: This part seems incorrect in the original code.
-    // `user.orders` is likely an array of order IDs.
-    // You would need to fetch the specific order or iterate through orders.
-    // Assuming you want to remove from the latest order or a specific one.
-    // This logic needs review based on your actual data structure and requirements.
-    // For now, keeping the structure similar but noting the potential issue.
-
-    // Example: Get the latest order (this is just one interpretation)
-    const orders = await Orders.findOne({ _id: { $in: user.orders } }).sort({ createdAt: -1 });
-    if (!orders) return res.status(404).json({ message: "Orders not found" });
-
-    if (!orders.couponCode) {
-      return res.status(400).json({ message: "No coupon applied to orders" });
-    }
-
-    const coupon = await Coupon.findOne({ coupon: orders.couponCode });
-    if (coupon) {
-      coupon.usedBy = coupon.usedBy.filter(
-        (userId) => userId.toString() !== user._id.toString()
-      );
-      await coupon.save();
-    }
-
-    orders.couponCode = undefined;
-    // Assuming calculateOrderTotal is meant to be used here, or a similar function
-    orders.total = calculateOrderTotal(orders.items); // This might need adjustment
-    await orders.save();
-
-    res.status(200).json({
-      message: "Coupon removed successfully",
-      orders,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Failed to remove coupon",
-      error: err.message,
-    });
-  }
-};
-
+// Retired: removing a checkout preview must never reprice an existing order.
+exports.removeCouponFromOrders = (_req, res) =>
+  res.status(410).json({
+    message:
+      "Remove coupon previews locally before checkout. Saved orders cannot be repriced here.",
+  });

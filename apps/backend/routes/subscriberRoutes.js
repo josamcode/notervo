@@ -7,7 +7,6 @@ const {
 } = require("../controllers/subscriberController");
 const { verifyToken, isAdmin } = require("../middlewares/auth");
 
-
 // Public - Add new subscriber
 router.post("/", verifyToken, addSubscriber);
 

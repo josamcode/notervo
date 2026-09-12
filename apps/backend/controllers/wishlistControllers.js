@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const Product = require("../models/Product");
 const Wishlist = require("../models/Wishlist");
 const { default: mongoose } = require("mongoose");
 

@@ -8,7 +8,7 @@ const {
   deleteUser,
   getUsers,
   getUserById,
-  verifyEmail
+  verifyEmail,
 } = require("../controllers/usersControllers");
 const { verifyToken, isAdmin } = require("../middlewares/auth");
 

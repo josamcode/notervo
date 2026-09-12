@@ -7,7 +7,10 @@ const {
   deleteCloudinaryImageByUrl,
 } = require("../config/cloudinary");
 
-const LOCAL_PRODUCTS_IMAGE_DIR = path.join(__dirname, "../public/images/products");
+const LOCAL_PRODUCTS_IMAGE_DIR = path.join(
+  __dirname,
+  "../public/images/products"
+);
 
 function parseImagesInput(imagesInput) {
   if (!imagesInput) return [];

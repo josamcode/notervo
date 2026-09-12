@@ -22,7 +22,7 @@ const subscriberSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/\S+@\S+\.\S+/, "Invalid email format"]
+      match: [/\S+@\S+\.\S+/, "Invalid email format"],
     },
   },
   { timestamps: true }

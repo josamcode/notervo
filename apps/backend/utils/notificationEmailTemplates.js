@@ -4,17 +4,17 @@
    Design tokens — matches emailTemplates.js
    ───────────────────────────────────────────────────────── */
 const brand = {
-  primary: '#222222',
-  primaryDark: '#111111',
-  surface: '#FAFAFA',
-  border: '#E8E8E8',
-  borderLight: '#F0F0F0',
-  textDark: '#1A1A1A',
-  textMid: '#555555',
-  textLight: '#888888',
-  white: '#FFFFFF',
-  radius: '16px',
-  radiusSm: '12px',
+  primary: "#222222",
+  primaryDark: "#111111",
+  surface: "#FAFAFA",
+  border: "#E8E8E8",
+  borderLight: "#F0F0F0",
+  textDark: "#1A1A1A",
+  textMid: "#555555",
+  textLight: "#888888",
+  white: "#FFFFFF",
+  radius: "16px",
+  radiusSm: "12px",
   year: new Date().getFullYear(),
 };
 
@@ -49,7 +49,7 @@ const getPromotionalEmailHTML = (
 <body style="margin:0;padding:0;background-color:${brand.surface};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;">
   <!-- Preheader (hidden preview text) -->
   <div style="display:none;font-size:1px;color:${brand.surface};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
-    ${message.replace(/<[^>]*>/g, '').substring(0, 120)}&hellip;
+    ${message.replace(/<[^>]*>/g, "").substring(0, 120)}&hellip;
   </div>
 
   <!-- Outer wrapper -->
@@ -79,10 +79,12 @@ const getPromotionalEmailHTML = (
           </tr>
 
           <!-- ── Hero image (optional) ── -->
-          ${imageUrl ? `
+          ${
+            imageUrl
+              ? `
           <tr>
             <td style="padding:0;line-height:0;">
-              <a href="${buttonLink || '#'}" style="text-decoration:none;">
+              <a href="${buttonLink || "#"}" style="text-decoration:none;">
                 <img
                   src="${imageUrl}"
                   alt="${subject}"
@@ -92,11 +94,13 @@ const getPromotionalEmailHTML = (
               </a>
             </td>
           </tr>
-          ` : ''}
+          `
+              : ""
+          }
 
           <!-- ── Content ── -->
           <tr>
-            <td style="padding:${imageUrl ? '28px' : '36px'} 32px 16px;">
+            <td style="padding:${imageUrl ? "28px" : "36px"} 32px 16px;">
               <!-- Subject heading -->
               <h1 style="margin:0 0 4px;font-size:22px;font-weight:800;color:${brand.textDark};letter-spacing:-0.3px;line-height:1.3;">
                 ${subject}
@@ -117,13 +121,15 @@ const getPromotionalEmailHTML = (
 
               <!-- Message body -->
               <div style="font-size:14px;color:${brand.textMid};line-height:1.7;">
-                ${message.replace(/\n/g, '<br>')}
+                ${message.replace(/\n/g, "<br>")}
               </div>
             </td>
           </tr>
 
           <!-- ── CTA button (optional) ── -->
-          ${buttonText && buttonLink ? `
+          ${
+            buttonText && buttonLink
+              ? `
           <tr>
             <td style="padding:8px 32px 32px;">
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
@@ -137,11 +143,13 @@ const getPromotionalEmailHTML = (
               </table>
             </td>
           </tr>
-          ` : `
+          `
+              : `
           <tr>
             <td style="padding:0 32px 32px;"></td>
           </tr>
-          `}
+          `
+          }
 
           <!-- ── Footer ── -->
           <tr>

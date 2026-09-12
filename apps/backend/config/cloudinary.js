@@ -4,8 +4,8 @@ const CLOUDINARY_FOLDER = "notervo/products";
 
 const hasCloudinaryConfig = Boolean(
   process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
 );
 
 if (!hasCloudinaryConfig) {
@@ -51,7 +51,7 @@ function extractPublicIdFromCloudinaryUrl(imageUrl) {
     }
 
     const parsed = new URL(imageUrl);
-    if (!parsed.hostname.includes("res.cloudinary.com")) {
+    if (parsed.hostname !== "res.cloudinary.com") {
       return null;
     }
 

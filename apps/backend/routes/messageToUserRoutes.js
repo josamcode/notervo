@@ -36,5 +36,4 @@ router.put("/edit/:id", verifyToken, isAdmin, updateMessage);
 // Admin: delete message
 router.delete("/:id", verifyToken, isAdmin, deleteMessage);
 
-
 module.exports = router;

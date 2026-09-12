@@ -58,16 +58,9 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [/\S+@\S+\.\S+/, 'Invalid email address'],
+      match: [/\S+@\S+\.\S+/, "Invalid email address"],
     },
-    password: {
-      type: String,
-      required: true,
-      match: [
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number",
-      ],
-    },
+    password: { type: String, required: true },
     address: {
       country: { type: String, default: "" },
       city: { type: String, default: "" },
@@ -85,8 +78,9 @@ const userSchema = new mongoose.Schema(
     verificationToken: {
       type: String,
     },
+    verificationTokenExpiresAt: Date,
     orders: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Orders", default: [] },
+      { type: mongoose.Schema.Types.ObjectId, ref: "Order", default: [] },
     ],
     cart: {
       type: mongoose.Schema.Types.ObjectId,

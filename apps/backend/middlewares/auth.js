@@ -1,69 +1,37 @@
 const jwt = require("jsonwebtoken");
-
 function verifyToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader)
-    return res
-      .status(401)
-      .json({ message: "Access denied. No token provided." });
-
-  const token = authHeader.split(" ")[1]; // Bearer <token>
-  if (!token)
-    return res
-      .status(401)
-      .json({ message: "Access denied. Invalid token format." });
-
+  const match = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization || "");
+  if (!match)
+    return res.status(401).json({ message: "A Bearer token is required." });
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, role }
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Invalid or expired token." });
-  }
-}
-
-function optionalVerifyToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) {
+    const payload = jwt.verify(match[1], process.env.JWT_SECRET, {
+      algorithms: ["HS256"],
+    });
+    if (
+      payload.purpose ||
+      typeof payload.id !== "string" ||
+      !["user", "admin"].includes(payload.role)
+    )
+      return res.status(401).json({ message: "Invalid account token." });
+    req.user = payload;
     return next();
-  }
-
-  const token = authHeader.split(" ")[1]; // Bearer <token>
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access denied. Invalid token format." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, role }
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Invalid or expired token." });
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired token." });
   }
 }
-
+function optionalVerifyToken(req, res, next) {
+  return req.headers.authorization ? verifyToken(req, res, next) : next();
+}
 function isAdmin(req, res, next) {
-  if (req.user.role === "admin") {
-    next();
-  } else {
-    res.status(403).json({ message: "Forbidden. Admins only." });
-  }
+  return req.user?.role === "admin"
+    ? next()
+    : res.status(403).json({ message: "Forbidden. Admins only." });
 }
-
 function isUserOrAdmin(req, res, next) {
-  const userId = req.params.id || req.user.id;
-  if (req.user.role === "admin" || req.user.id === userId) {
-    next();
-  } else {
-    res.status(403).json({ message: "Forbidden. Not authorized." });
-  }
+  return req.user &&
+    (req.user.role === "admin" ||
+      req.user.id === (req.params.id || req.user.id))
+    ? next()
+    : res.status(403).json({ message: "Forbidden. Not authorized." });
 }
-
-module.exports = {
-  verifyToken,
-  optionalVerifyToken,
-  isAdmin,
-  isUserOrAdmin,
-};
+module.exports = { verifyToken, optionalVerifyToken, isAdmin, isUserOrAdmin };

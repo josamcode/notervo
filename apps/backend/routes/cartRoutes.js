@@ -8,8 +8,6 @@ const {
   updateProductQuantity,
   clearCart,
   getCart,
-  applyCoupon,
-  removeCouponFromCart,
 } = require("../controllers/cartControllers");
 
 router.get("/", verifyToken, getCart);

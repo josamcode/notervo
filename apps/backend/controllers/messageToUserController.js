@@ -23,25 +23,25 @@ exports.createMessage = async (req, res) => {
 exports.createMessageToAll = async (req, res) => {
   try {
     const { content, type } = req.body;
-    
+
     if (!content || content.trim().length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        error: "Message content is required" 
+      return res.status(400).json({
+        success: false,
+        error: "Message content is required",
       });
     }
 
     const users = await User.find({ role: { $ne: "admin" } }, "_id");
-    
+
     if (!users || users.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        error: "No users found to send messages to" 
+      return res.status(404).json({
+        success: false,
+        error: "No users found to send messages to",
       });
     }
 
     // Create message records for each user
-    const messages = users.map(user => ({
+    const messages = users.map((user) => ({
       sender: req.user.id,
       receiver: user._id,
       content: content.trim(),
@@ -51,18 +51,18 @@ exports.createMessageToAll = async (req, res) => {
     // Insert all messages at once
     const createdMessages = await MessageToUser.insertMany(messages);
 
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       message: `Message sent to ${createdMessages.length} users`,
       count: createdMessages.length,
-      messages: createdMessages 
+      messages: createdMessages,
     });
   } catch (err) {
     console.error("Error sending message to all users:", err);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       error: "Failed to send message to all users",
-      details: err.message 
+      details: err.message,
     });
   }
 };
@@ -84,8 +84,9 @@ exports.getAllMessages = async (req, res) => {
 // Admin + User: Get my messages
 exports.getMyMessages = async (req, res) => {
   try {
-    const messages = await MessageToUser.find({ receiver: req.user.id })
-      .sort({ createdAt: -1 });
+    const messages = await MessageToUser.find({ receiver: req.user.id }).sort({
+      createdAt: -1,
+    });
 
     res.json({ success: true, messages });
   } catch (err) {
@@ -104,7 +105,9 @@ exports.getMessageById = async (req, res) => {
       req.user.role !== "admin" &&
       message.receiver.toString() !== req.user.id
     ) {
-      return res.status(403).json({ message: "Not authorized to view this message" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this message" });
     }
 
     res.json({ success: true, message });
@@ -117,7 +120,9 @@ exports.markMessagesAsRead = async (req, res) => {
   const { messageIds } = req.body;
 
   if (!Array.isArray(messageIds) || messageIds.length === 0) {
-    return res.status(400).json({ message: "messageIds is required and must be an array" });
+    return res
+      .status(400)
+      .json({ message: "messageIds is required and must be an array" });
   }
 
   try {

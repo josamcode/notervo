@@ -1,5 +1,5 @@
 // controllers/usersControllers.js
-const express = require("express");
+const crypto = require("node:crypto");
 const User = require("../models/User");
 const Orders = require("../models/Orders");
 const mongoose = require("mongoose");
@@ -12,16 +12,11 @@ const {
   getEmailVerificationSuccessHTML,
   getInvalidTokenHTML,
   getMissingTokenHTML,
-  getGenericVerificationErrorHTML
-} = require('../utils/emailTemplates');
+  getGenericVerificationErrorHTML,
+} = require("../utils/emailTemplates");
 
-function generateVerificationToken(length = 32) {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let token = '';
-  for (let i = 0; i < length; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return token;
+function generateVerificationToken() {
+  return crypto.randomBytes(32).toString("hex");
 }
 
 function sanitizeAddressValue(value) {
@@ -40,21 +35,15 @@ function sanitizeShippingAddress(address = {}) {
 
 function isShippingAddressComplete(address) {
   return Boolean(
-    address.fullName &&
-    address.phone &&
-    address.city &&
-    address.street
+    address.fullName && address.phone && address.city && address.street
   );
 }
 
 function getAddressIdentity(address) {
-  return [
-    address.fullName,
-    address.phone,
-    address.city,
-    address.street,
-  ]
-    .map((value) => sanitizeAddressValue(value).toLowerCase().replace(/\s+/g, " "))
+  return [address.fullName, address.phone, address.city, address.street]
+    .map((value) =>
+      sanitizeAddressValue(value).toLowerCase().replace(/\s+/g, " ")
+    )
     .join("|");
 }
 
@@ -63,7 +52,10 @@ async function migrateShippingAddressesFromOrdersIfNeeded(user) {
     return false;
   }
 
-  if (Array.isArray(user.shippingAddresses) && user.shippingAddresses.length > 0) {
+  if (
+    Array.isArray(user.shippingAddresses) &&
+    user.shippingAddresses.length > 0
+  ) {
     return false;
   }
 
@@ -112,7 +104,17 @@ async function migrateShippingAddressesFromOrdersIfNeeded(user) {
 
 exports.createUser = async (req, res) => {
   try {
-    const { password, phone, email, username, address } = req.body;
+    const { password, phone, email, username, address } = req.body || {};
+    if (
+      ![password, phone, email, username].every(
+        (value) => typeof value === "string" && value.trim()
+      ) ||
+      Buffer.byteLength(password) > 72
+    )
+      return res.status(400).json({
+        message:
+          "Name, phone, email and password are required; password must not exceed 72 bytes.",
+      });
 
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
@@ -123,11 +125,15 @@ exports.createUser = async (req, res) => {
 
     const existingUserByPhone = await User.findOne({ phone });
     if (existingUserByPhone) {
-      return res.status(400).json({ message: "Phone number already registered." });
+      return res
+        .status(400)
+        .json({ message: "Phone number already registered." });
     }
 
     if (email) {
-      const existingUserByEmail = await User.findOne({ email: email.toLowerCase() });
+      const existingUserByEmail = await User.findOne({
+        email: email.toLowerCase(),
+      });
       if (existingUserByEmail) {
         return res.status(400).json({ message: "Email already registered." });
       }
@@ -151,6 +157,9 @@ exports.createUser = async (req, res) => {
     if (email) {
       const verificationToken = generateVerificationToken();
       userData.verificationToken = verificationToken;
+      userData.verificationTokenExpiresAt = new Date(
+        Date.now() + 24 * 60 * 60 * 1000
+      );
       userData.isVerified = false;
     }
 
@@ -160,18 +169,19 @@ exports.createUser = async (req, res) => {
     let emailSent = false;
     if (email && result.email) {
       try {
-        const verificationUrl = `${process.env.BASE_URL || req.protocol + '://' + req.get('host')}/api/auth/verify-email?token=${result.verificationToken}`;
+        const verificationUrl = `${process.env.BASE_URL || req.protocol + "://" + req.get("host")}/api/auth/verify-email?token=${result.verificationToken}`;
         const mailOptions = {
-          from: process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
+          from:
+            process.env.EMAIL_FROM || `"Notervo" <${process.env.EMAIL_USER}>`,
           to: result.email,
-          subject: 'Verify Your Email Address',
+          subject: "Verify Your Email Address",
           html: getVerificationEmailHTML(result.username, verificationUrl),
         };
         await transporter.sendMail(mailOptions);
         emailSent = true;
-        console.log('Verification email sent successfully to:', result.email);
+        console.log("Verification email sent successfully to:", result.email);
       } catch (emailErr) {
-        console.error('Error sending verification email:', emailErr);
+        console.error("Error sending verification email:", emailErr);
       }
     }
 
@@ -187,21 +197,23 @@ exports.createUser = async (req, res) => {
         username: result.username,
         createdAt: result.createdAt,
         updatedAt: result.updatedAt,
-        isVerified: result.isVerified
+        isVerified: result.isVerified,
       },
     });
   } catch (err) {
     console.error("Registration error:", err);
-    if (err.name === 'ValidationError') {
-      const messages = Object.values(err.errors).map(e => e.message);
+    if (err.name === "ValidationError") {
+      const messages = Object.values(err.errors).map((e) => e.message);
       return res.status(400).json({
         message: "Validation Error",
-        errors: messages
+        errors: messages,
       });
     }
     if (err.code === 11000) {
-      const field = Object.keys(err.keyPattern)[0] || 'field';
-      return res.status(400).json({ message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.` });
+      const field = Object.keys(err.keyPattern)[0] || "field";
+      return res.status(400).json({
+        message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`,
+      });
     }
     res.status(500).json({
       message: "An error occurred during registration.",
@@ -213,17 +225,21 @@ exports.createUser = async (req, res) => {
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-    if (!token) {
+    if (typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)) {
       return res.status(400).send(getMissingTokenHTML());
     }
 
-    const user = await User.findOne({ verificationToken: token });
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpiresAt: { $gt: new Date() },
+    });
     if (!user) {
       return res.status(400).send(getInvalidTokenHTML());
     }
 
     user.isVerified = true;
     user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
     await user.save();
 
     res.status(200).send(getEmailVerificationSuccessHTML(user.username));
@@ -235,7 +251,17 @@ exports.verifyEmail = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
+    const { identifier, password } = req.body || {};
+    if (
+      typeof identifier !== "string" ||
+      typeof password !== "string" ||
+      !identifier.trim() ||
+      !password ||
+      Buffer.byteLength(password) > 72
+    )
+      return res
+        .status(400)
+        .json({ message: "Identifier and password are required." });
     let user = null;
 
     user = await User.findOne({ phone: identifier });
@@ -244,22 +270,24 @@ exports.loginUser = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    if (user.email && user.email.toLowerCase() === identifier.toLowerCase() && !user.isVerified) {
-      return res.status(401).json({ message: "Please verify your email address before logging in with email." });
+    if (!user.isVerified) {
+      return res.status(401).json({
+        message: "Please verify your email address before logging in.",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password." });
+      return res.status(401).json({ message: "Invalid credentials." });
     }
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "365d" }
+      { algorithm: "HS256", expiresIn: "7d" }
     );
 
     return res.status(200).json({
@@ -271,7 +299,7 @@ exports.loginUser = async (req, res) => {
         email: user.email || null,
         role: user.role,
         username: user.username,
-        isVerified: user.isVerified || false
+        isVerified: user.isVerified || false,
       },
     });
   } catch (err) {
@@ -285,7 +313,9 @@ exports.loginUser = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    const users = await User.find().select(
+      "-password -verificationToken -verificationTokenExpiresAt"
+    );
     res.status(200).json({
       message: "Users fetched successfully",
       count: users.length,
@@ -306,7 +336,9 @@ exports.getUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select(
+      "-password -verificationToken -verificationTokenExpiresAt"
+    );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -332,7 +364,9 @@ exports.getUserById = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const user = await User.findById(id).select("-password");
+    const user = await User.findById(id).select(
+      "-password -verificationToken -verificationTokenExpiresAt"
+    );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -353,11 +387,25 @@ exports.updateUser = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    if ("role" in req.body) {
-      delete req.body.role;
-    }
+    const allowedFields = [
+      "username",
+      "phone",
+      "password",
+      "address",
+      "shippingAddresses",
+    ];
+    req.body = Object.fromEntries(
+      Object.entries(req.body || {}).filter(([key]) =>
+        allowedFields.includes(key)
+      )
+    );
 
-    if (req.body.password) {
+    if ("password" in req.body) {
+      if (
+        typeof req.body.password !== "string" ||
+        Buffer.byteLength(req.body.password) > 72
+      )
+        return res.status(400).json({ message: "Invalid password" });
       if (!passwordRegex.test(req.body.password)) {
         return res.status(400).json({
           message:
@@ -375,7 +423,7 @@ exports.updateUser = async (req, res) => {
       userId,
       { $set: req.body },
       { new: true, runValidators: true }
-    ).select("-password");
+    ).select("-password -verificationToken -verificationTokenExpiresAt");
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -402,11 +450,13 @@ exports.deleteUser = async (req, res) => {
     }
 
     if (userId === req.user.id) {
-      return res.status(400).json({ message: "You cannot delete your own account" });
+      return res
+        .status(400)
+        .json({ message: "You cannot delete your own account" });
     }
 
     const targetUser = await User.findById(userId);
-    if (targetUser && targetUser.role === 'admin') {
+    if (targetUser && targetUser.role === "admin") {
       return res.status(403).json({ message: "You cannot delete admin users" });
     }
 

@@ -1,9 +1,11 @@
-const roundToTwo = (value) => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+const roundToTwo = (value) =>
+  Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
 const getDiscountedPrice = (product = {}) => {
   const original = Number(product.price) || 0;
   const discountValue = Number(product.discount) || 0;
-  const discountType = product.discountType === "percentage" ? "percentage" : "fixed";
+  const discountType =
+    product.discountType === "percentage" ? "percentage" : "fixed";
 
   if (!discountValue || original <= 0) {
     return {
