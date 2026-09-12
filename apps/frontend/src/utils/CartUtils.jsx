@@ -18,7 +18,7 @@ export async function addToCart(
     if (!color || !size) {
       try {
         const productRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/${productId}`
+          `${import.meta.env.VITE_API_URL}/products/${productId}`
         );
 
         const product = productRes.data;
@@ -52,7 +52,7 @@ export async function addToCart(
     }
 
     const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/cart/add/${productId}`,
+      `${import.meta.env.VITE_API_URL}/cart/add/${productId}`,
       {
         quantity,
         color,
@@ -78,7 +78,6 @@ export async function addToCart(
   }
 }
 
-
 export async function removeFromCart(productId, color = null, size = null) {
   try {
     const token = Cookies.get("token");
@@ -93,7 +92,7 @@ export async function removeFromCart(productId, color = null, size = null) {
     }
 
     const response = await axios.delete(
-      `${process.env.REACT_APP_API_URL}/cart/remove/${productId}`,
+      `${import.meta.env.VITE_API_URL}/cart/remove/${productId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -125,7 +124,7 @@ export async function checkProductInCart(productId, color, size) {
   }
 
   try {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

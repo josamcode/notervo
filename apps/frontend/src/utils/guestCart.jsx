@@ -15,7 +15,10 @@ function sanitizeGuestCartItems(rawItems) {
   return rawItems
     .map((item) => ({
       productId: String(item?.productId || ""),
-      quantity: Math.max(1, Number(item?.quantity) || 1),
+      quantity: Math.min(
+        999,
+        Math.max(1, Math.floor(Number(item?.quantity)) || 1)
+      ),
       color: normalizeVariantValue(item?.color),
       size: normalizeVariantValue(item?.size),
     }))
@@ -145,4 +148,3 @@ export function updateGuestCartItemQuantity(
   setGuestCartItems(items);
   return { success: true, items };
 }
-

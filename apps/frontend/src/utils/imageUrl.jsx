@@ -7,5 +7,5 @@ export function resolveProductImageUrl(image) {
     return image;
   }
 
-  return `${process.env.REACT_APP_API_URL}/public/images/products/${image}`;
+  return `${import.meta.env.VITE_API_URL}/public/images/products/${image}`;
 }

@@ -1,6 +1,12 @@
 import React from "react";
 
-const GradientButton = ({ children, onClick, className = "", disabled = false, ...props }) => {
+const GradientButton = ({
+  children,
+  onClick,
+  className = "",
+  disabled = false,
+  ...props
+}) => {
   return (
     <button
       onClick={onClick}

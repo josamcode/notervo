@@ -9,9 +9,7 @@ function sanitizeWishlistItems(rawItems) {
     return [];
   }
 
-  return rawItems
-    .map((item) => normalizeProductId(item))
-    .filter(Boolean);
+  return rawItems.map((item) => normalizeProductId(item)).filter(Boolean);
 }
 
 export function getGuestWishlistItems() {
@@ -96,4 +94,3 @@ export function clearGuestWishlist() {
   }
   window.localStorage.removeItem(GUEST_WISHLIST_STORAGE_KEY);
 }
-

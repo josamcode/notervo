@@ -38,7 +38,10 @@ const SocialLink = ({ href, icon: Ico, label }) => (
 /* ───────────── footer link ───────────── */
 const FooterLink = ({ to, children }) => (
   <li>
-    <Link to={to} className="text-sm text-gray-400 hover:text-white transition-colors duration-200 inline-flex items-center gap-1 group">
+    <Link
+      to={to}
+      className="text-sm text-gray-400 hover:text-white transition-colors duration-200 inline-flex items-center gap-1 group"
+    >
       <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
       {children}
     </Link>
@@ -58,7 +61,7 @@ const Footer = () => {
     try {
       const token = Cookies.get("token");
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/subscribers`,
+        `${import.meta.env.VITE_API_URL}/subscribers`,
         { email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -87,18 +90,33 @@ const Footer = () => {
             <div className="lg:col-span-4">
               <img src="/logo.png" alt="Notervo" className="h-7 w-auto mb-5" />
               <p className="text-sm leading-relaxed text-gray-400 max-w-xs mb-6">
-                Minimal notebooks for focused work, clear thinking, and premium everyday writing.
+                Minimal notebooks for focused work, clear thinking, and premium
+                everyday writing.
               </p>
               <div className="flex gap-2">
-                <SocialLink href="https://facebook.com/notervo.eg" icon={FacebookIcon} label="Facebook" />
-                <SocialLink href="https://instagram.com/notervo.eg" icon={InstagramIcon} label="Instagram" />
-                <SocialLink href="https://www.tiktok.com/@notervo.eg" icon={TikTokIcon} label="Tiktok" />
+                <SocialLink
+                  href="https://facebook.com/notervo.eg"
+                  icon={FacebookIcon}
+                  label="Facebook"
+                />
+                <SocialLink
+                  href="https://instagram.com/notervo.eg"
+                  icon={InstagramIcon}
+                  label="Instagram"
+                />
+                <SocialLink
+                  href="https://www.tiktok.com/@notervo.eg"
+                  icon={TikTokIcon}
+                  label="Tiktok"
+                />
               </div>
             </div>
 
             {/* Company links */}
             <div className="lg:col-span-2">
-              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">Company</h3>
+              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">
+                Company
+              </h3>
               <ul className="space-y-2.5">
                 <FooterLink to="/about">About Us</FooterLink>
                 <FooterLink to="/contact">Contact Us</FooterLink>
@@ -108,7 +126,9 @@ const Footer = () => {
 
             {/* Support links */}
             <div className="lg:col-span-2">
-              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">Support</h3>
+              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">
+                Support
+              </h3>
               <ul className="space-y-2.5">
                 <FooterLink to="/help-center">Help Center</FooterLink>
                 <FooterLink to="/shipping">Shipping Info</FooterLink>
@@ -120,9 +140,12 @@ const Footer = () => {
 
             {/* Newsletter */}
             <div className="lg:col-span-4">
-              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">Stay Updated</h3>
+              <h3 className="text-white text-sm font-bold uppercase tracking-wider mb-4">
+                Stay Updated
+              </h3>
               <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                Get notebook launches, limited editions, and practical writing tips.
+                Get notebook launches, limited editions, and practical writing
+                tips.
               </p>
               <form onSubmit={handleSubscribe} className="space-y-2.5">
                 <div className="flex gap-2">
@@ -141,16 +164,41 @@ const Footer = () => {
                   >
                     {subscribing ? (
                       <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
                       </svg>
-                    ) : "Subscribe"}
+                    ) : (
+                      "Subscribe"
+                    )}
                   </button>
                 </div>
                 {subscribed && (
                   <p className="text-xs text-green-400 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m4.5 12.75 6 6 9-13.5"
+                      />
                     </svg>
                     You're subscribed! Check your inbox.
                   </p>

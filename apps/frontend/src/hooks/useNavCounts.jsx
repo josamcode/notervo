@@ -28,13 +28,13 @@ export default function useNavCounts() {
 
     try {
       const [cartRes, wishlistRes, myMessagesRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_API_URL}/cart`, {
+        axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get(`${process.env.REACT_APP_API_URL}/wishlist`, {
+        axios.get(`${import.meta.env.VITE_API_URL}/wishlist`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get(`${process.env.REACT_APP_API_URL}/message-to-user/my`, {
+        axios.get(`${import.meta.env.VITE_API_URL}/message-to-user/my`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -42,7 +42,8 @@ export default function useNavCounts() {
       setCounts({
         cartCount: cartRes.data.cart?.items?.length || 0,
         wishlistCount: wishlistRes.data.wishlist?.items?.length || 0,
-        messagesCount: myMessagesRes.data.messages?.filter((msg) => !msg.isRead).length || 0,
+        messagesCount:
+          myMessagesRes.data.messages?.filter((msg) => !msg.isRead).length || 0,
       });
     } catch {
       setCounts({

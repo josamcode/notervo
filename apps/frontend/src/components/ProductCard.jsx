@@ -17,28 +17,75 @@ import Currency from "./Currency";
 
 /* ───────────── micro icons ───────────── */
 const HeartOutline = ({ className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+    />
   </svg>
 );
 const HeartSolid = ({ className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
     <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
   </svg>
 );
 const StarSolid = ({ className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path
+      fillRule="evenodd"
+      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+      clipRule="evenodd"
+    />
   </svg>
 );
 const CartPlus = ({ className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.8}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 4.5v15m7.5-7.5h-15"
+    />
   </svg>
 );
 const CartCheck = ({ className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m4.5 12.75 6 6 9-13.5"
+    />
   </svg>
 );
 
@@ -74,7 +121,11 @@ export default function ProductCard({ product }) {
     const check = async () => {
       setCheckingCart(true);
       setCheckingWishlist(true);
-      const cartExists = await checkProductInCart(product._id, defaultColor, defaultSize);
+      const cartExists = await checkProductInCart(
+        product._id,
+        defaultColor,
+        defaultSize
+      );
       const wishlistExists = await checkProductInWishlist(product._id);
       setInCart(cartExists);
       setInWishlist(wishlistExists);
@@ -90,7 +141,11 @@ export default function ProductCard({ product }) {
     setTimeout(() => setCartAnimating(false), 400);
 
     if (inCart) {
-      const result = await removeFromCart(product._id, defaultColor, defaultSize);
+      const result = await removeFromCart(
+        product._id,
+        defaultColor,
+        defaultSize
+      );
       if (result.success) {
         setInCart(false);
         showSuccess(`${product.title} removed from cart.`);
@@ -157,10 +212,11 @@ export default function ProductCard({ product }) {
           className={`
                         absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center
                         transition-all duration-200 shadow-md backdrop-blur-sm
-                        ${inWishlist
-              ? "bg-red-50 text-red-500 hover:bg-red-100"
-              : "bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white"
-            }
+                        ${
+                          inWishlist
+                            ? "bg-red-50 text-red-500 hover:bg-red-100"
+                            : "bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white"
+                        }
                     `}
           title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
         >
@@ -198,9 +254,13 @@ export default function ProductCard({ product }) {
         {/* Rating */}
         <div className="flex items-center gap-1 mb-2.5">
           <StarSolid className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs font-bold text-gray-700">{product.rating.toFixed(1)}</span>
+          <span className="text-xs font-bold text-gray-700">
+            {product.rating.toFixed(1)}
+          </span>
           {product.numReviews > 0 && (
-            <span className="text-[11px] text-gray-400">({product.numReviews})</span>
+            <span className="text-[11px] text-gray-400">
+              ({product.numReviews})
+            </span>
           )}
         </div>
 
@@ -210,7 +270,9 @@ export default function ProductCard({ product }) {
             <span className="text-sm sm:text-lg font-extrabold text-gray-900">
               {finalPrice.toFixed(2)}
             </span>
-            <span><Currency className="text-[9px] sm:text-[11px] text-gray-400 font-medium" /></span>
+            <span>
+              <Currency className="text-[9px] sm:text-[11px] text-gray-400 font-medium" />
+            </span>
             {product.discount > 0 && (
               <span className="text-xs text-gray-400 line-through">
                 {product.price.toFixed(2)}
@@ -226,17 +288,30 @@ export default function ProductCard({ product }) {
               className={`
                                 flex-shrink-0 w-9 h-9 rounded-xl hidden items-center sm:flex justify-center transition-all duration-200
                                 ${cartAnimating ? "scale-125" : "scale-100"}
-                                ${inCart
-                  ? "bg-primary text-white shadow-md shadow-primary/20"
-                  : "bg-gray-100 text-gray-600 hover:bg-primary hover:text-white hover:shadow-md hover:shadow-primary/20"
-                }
+                                ${
+                                  inCart
+                                    ? "bg-primary text-white shadow-md shadow-primary/20"
+                                    : "bg-gray-100 text-gray-600 hover:bg-primary hover:text-white hover:shadow-md hover:shadow-primary/20"
+                                }
                             `}
               title={inCart ? "Remove from Cart" : "Add to Cart"}
             >
               {checkingCart ? (
                 <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
               ) : inCart ? (
                 <CartCheck className="w-4 h-4" />

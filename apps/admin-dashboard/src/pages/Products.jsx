@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
-import Layout from '../components/Layout';
-import Cookies from 'js-cookie';
-import { resolveProductImageUrl } from '../utils/imageUrl';
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import Layout from "../components/Layout";
+import Cookies from "js-cookie";
+import { resolveProductImageUrl } from "../utils/imageUrl";
 
 const Notebooks = () => {
   const [products, setNotebooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(10);
@@ -22,44 +22,44 @@ const Notebooks = () => {
 
   // Form states
   const [createFormData, setCreateFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
+    title: "",
+    description: "",
+    price: "",
     category: [],
-    sizes: '',
-    colors: '',
-    brand: '',
+    sizes: "",
+    colors: "",
+    brand: "",
     inStock: true,
-    stockQuantity: '',
-    tags: '',
-    discount: '',
-    discountType: 'fixed',
-    rating: '',
-    numReviews: '',
-    images: []
+    stockQuantity: "",
+    tags: "",
+    discount: "",
+    discountType: "fixed",
+    rating: "",
+    numReviews: "",
+    images: [],
   });
 
   const [updateFormData, setUpdateFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
+    title: "",
+    description: "",
+    price: "",
     category: [],
-    sizes: '',
-    colors: '',
-    brand: '',
+    sizes: "",
+    colors: "",
+    brand: "",
     inStock: true,
-    stockQuantity: '',
-    tags: '',
-    discount: '',
-    discountType: 'fixed',
-    rating: '',
-    numReviews: '',
+    stockQuantity: "",
+    tags: "",
+    discount: "",
+    discountType: "fixed",
+    rating: "",
+    numReviews: "",
     images: [],
-    removeImages: []
+    removeImages: [],
   });
 
-  const token = Cookies.get('token');
-  const baseURL = process.env.REACT_APP_API_URL;
+  const token = Cookies.get("token");
+  const baseURL = import.meta.env.VITE_API_URL;
 
   // Fetch products
   useEffect(() => {
@@ -68,15 +68,18 @@ const Notebooks = () => {
       setError(null);
 
       try {
-        const response = await fetch(`${baseURL}/products?page=${currentPage}&limit=${limit}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${baseURL}/products?page=${currentPage}&limit=${limit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch notebooks');
+          throw new Error("Failed to fetch notebooks");
         }
 
         const data = await response.json();
@@ -84,7 +87,7 @@ const Notebooks = () => {
         setTotalPages(data.totalPages || 1);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching notebooks:', err);
+        console.error("Error fetching notebooks:", err);
       } finally {
         setLoading(false);
       }
@@ -101,7 +104,7 @@ const Notebooks = () => {
       try {
         const [categoriesRes, brandsRes] = await Promise.all([
           fetch(`${baseURL}/products/categories`),
-          fetch(`${baseURL}/products/brands`)
+          fetch(`${baseURL}/products/brands`),
         ]);
 
         if (categoriesRes.ok) {
@@ -114,7 +117,7 @@ const Notebooks = () => {
           setBrands(brandsData);
         }
       } catch (err) {
-        console.error('Error fetching categories/brands:', err);
+        console.error("Error fetching categories/brands:", err);
       }
     };
 
@@ -124,45 +127,45 @@ const Notebooks = () => {
   // Delete product
   const handleDeleteNotebook = async (productId, productTitle) => {
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: `You are about to delete notebook "${productTitle}". This action cannot be undone!`,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
     });
 
     if (result.isConfirmed) {
       try {
         const response = await fetch(`${baseURL}/products/${productId}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to delete notebook');
+          throw new Error("Failed to delete notebook");
         }
 
-        setNotebooks(products.filter(product => product._id !== productId));
+        setNotebooks(products.filter((product) => product._id !== productId));
 
         Swal.fire({
-          title: 'Deleted!',
-          text: 'Notebook has been deleted successfully.',
-          icon: 'success',
-          confirmButtonColor: '#222222'
+          title: "Deleted!",
+          text: "Notebook has been deleted successfully.",
+          icon: "success",
+          confirmButtonColor: "#222222",
         });
       } catch (err) {
-        console.error('Error deleting product:', err);
+        console.error("Error deleting product:", err);
         Swal.fire({
-          title: 'Error!',
-          text: 'Failed to delete notebook. Please try again.',
-          icon: 'error',
-          confirmButtonColor: '#222222'
+          title: "Error!",
+          text: "Failed to delete notebook. Please try again.",
+          icon: "error",
+          confirmButtonColor: "#222222",
         });
       }
     }
@@ -171,21 +174,21 @@ const Notebooks = () => {
   // Open create modal
   const handleOpenCreateModal = () => {
     setCreateFormData({
-      title: '',
-      description: '',
-      price: '',
+      title: "",
+      description: "",
+      price: "",
       category: [],
-      sizes: '',
-      colors: '',
-      brand: '',
+      sizes: "",
+      colors: "",
+      brand: "",
       inStock: true,
-      stockQuantity: '',
-      tags: '',
-      discount: '',
-      discountType: 'fixed',
-      rating: '',
-      numReviews: '',
-      images: []
+      stockQuantity: "",
+      tags: "",
+      discount: "",
+      discountType: "fixed",
+      rating: "",
+      numReviews: "",
+      images: [],
     });
     setShowCreateModal(true);
   };
@@ -194,22 +197,22 @@ const Notebooks = () => {
   const handleOpenUpdateModal = (product) => {
     setCurrentNotebook(product);
     setUpdateFormData({
-      title: product.title || '',
-      description: product.description || '',
-      price: product.price || '',
+      title: product.title || "",
+      description: product.description || "",
+      price: product.price || "",
       category: product.category || [],
-      sizes: product.sizes ? product.sizes.join(',') : '',
-      colors: product.colors ? product.colors.join(',') : '',
-      brand: product.brand || '',
+      sizes: product.sizes ? product.sizes.join(",") : "",
+      colors: product.colors ? product.colors.join(",") : "",
+      brand: product.brand || "",
       inStock: product.inStock !== undefined ? product.inStock : true,
-      stockQuantity: product.stockQuantity || '',
-      tags: product.tags ? product.tags.join(',') : '',
-      discount: product.discount || '',
-      discountType: product.discountType || 'fixed',
-      rating: product.rating || '',
-      numReviews: product.numReviews || '',
+      stockQuantity: product.stockQuantity || "",
+      tags: product.tags ? product.tags.join(",") : "",
+      discount: product.discount || "",
+      discountType: product.discountType || "fixed",
+      rating: product.rating || "",
+      numReviews: product.numReviews || "",
       images: product.images || [],
-      removeImages: []
+      removeImages: [],
     });
     setShowUpdateModal(true);
   };
@@ -227,25 +230,25 @@ const Notebooks = () => {
       // Otherwise, fetch the full product details
       const response = await fetch(`${baseURL}/products/${product._id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch notebook details');
+        throw new Error("Failed to fetch notebook details");
       }
 
       const productDetails = await response.json();
       setSelectedNotebookDetails(productDetails);
       setShowDetailsModal(true);
     } catch (err) {
-      console.error('Error fetching notebook details:', err);
+      console.error("Error fetching notebook details:", err);
       Swal.fire({
-        title: 'Error!',
-        text: 'Failed to load notebook details. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#222222'
+        title: "Error!",
+        text: "Failed to load notebook details. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#222222",
       });
     }
   };
@@ -262,16 +265,19 @@ const Notebooks = () => {
   // Handle create form input changes
   const handleCreateInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       setCreateFormData({ ...createFormData, [name]: checked });
-    } else if (name === 'category') {
-      const selectedCategories = Array.from(e.target.selectedOptions, option => option.value);
+    } else if (name === "category") {
+      const selectedCategories = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
       setCreateFormData({ ...createFormData, [name]: selectedCategories });
-    } else if (name === 'newBrand') {
+    } else if (name === "newBrand") {
       setCreateFormData({
         ...createFormData,
         newBrand: value,
-        brand: 'new'
+        brand: "new",
       });
     } else {
       setCreateFormData({ ...createFormData, [name]: value });
@@ -281,16 +287,19 @@ const Notebooks = () => {
   // Handle update form input changes
   const handleUpdateInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       setUpdateFormData({ ...updateFormData, [name]: checked });
-    } else if (name === 'category') {
-      const selectedCategories = Array.from(e.target.selectedOptions, option => option.value);
+    } else if (name === "category") {
+      const selectedCategories = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
       setUpdateFormData({ ...updateFormData, [name]: selectedCategories });
-    } else if (name === 'newBrand') {
+    } else if (name === "newBrand") {
       setUpdateFormData({
         ...updateFormData,
         newBrand: value,
-        brand: 'new'
+        brand: "new",
       });
     } else {
       setUpdateFormData({ ...updateFormData, [name]: value });
@@ -306,7 +315,10 @@ const Notebooks = () => {
   // Handle image file selection for update
   const handleUpdateImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setUpdateFormData({ ...updateFormData, images: [...updateFormData.images, ...files] });
+    setUpdateFormData({
+      ...updateFormData,
+      images: [...updateFormData.images, ...files],
+    });
   };
 
   // Handle image removal for update
@@ -314,7 +326,7 @@ const Notebooks = () => {
     setUpdateFormData({
       ...updateFormData,
       removeImages: [...updateFormData.removeImages, imagePath],
-      images: updateFormData.images.filter(img => img !== imagePath)
+      images: updateFormData.images.filter((img) => img !== imagePath),
     });
   };
 
@@ -326,16 +338,19 @@ const Notebooks = () => {
       const formData = new FormData();
 
       // Use new brand if 'new' is selected
-      const brandValue = createFormData.brand === 'new'
-        ? (createFormData.newBrand || 'Generic')
-        : (createFormData.brand || 'Generic');
+      const brandValue =
+        createFormData.brand === "new"
+          ? createFormData.newBrand || "Generic"
+          : createFormData.brand || "Generic";
 
       // Append text fields
-      Object.keys(createFormData).forEach(key => {
-        if (key === 'images' || key === 'newBrand') return;
-        if (key === 'category') {
-          createFormData[key].forEach(cat => formData.append('category', cat));
-        } else if (key === 'brand') {
+      Object.keys(createFormData).forEach((key) => {
+        if (key === "images" || key === "newBrand") return;
+        if (key === "category") {
+          createFormData[key].forEach((cat) =>
+            formData.append("category", cat)
+          );
+        } else if (key === "brand") {
           formData.append(key, brandValue);
         } else {
           formData.append(key, createFormData[key]);
@@ -343,41 +358,41 @@ const Notebooks = () => {
       });
 
       // Append image files
-      createFormData.images.forEach(image => {
-        formData.append('images', image);
+      createFormData.images.forEach((image) => {
+        formData.append("images", image);
       });
 
       const response = await fetch(`${baseURL}/products`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create notebook');
+        throw new Error(errorData.message || "Failed to create notebook");
       }
 
       const newNotebook = await response.json();
       setNotebooks([newNotebook, ...products]);
 
       Swal.fire({
-        title: 'Success!',
-        text: 'Notebook created successfully.',
-        icon: 'success',
-        confirmButtonColor: '#222222'
+        title: "Success!",
+        text: "Notebook created successfully.",
+        icon: "success",
+        confirmButtonColor: "#222222",
       });
 
       handleCloseModals();
     } catch (err) {
-      console.error('Error creating product:', err);
+      console.error("Error creating product:", err);
       Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to create notebook. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#222222'
+        title: "Error!",
+        text: err.message || "Failed to create notebook. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#222222",
       });
     }
   };
@@ -390,16 +405,20 @@ const Notebooks = () => {
       const formData = new FormData();
 
       // Use new brand if 'new' is selected
-      const brandValue = updateFormData.brand === 'new'
-        ? (updateFormData.newBrand || updateFormData.brand)
-        : (updateFormData.brand || updateFormData.brand);
+      const brandValue =
+        updateFormData.brand === "new"
+          ? updateFormData.newBrand || updateFormData.brand
+          : updateFormData.brand || updateFormData.brand;
 
       // Append text fields
-      Object.keys(updateFormData).forEach(key => {
-        if (key === 'images' || key === 'removeImages' || key === 'newBrand') return;
-        if (key === 'category') {
-          updateFormData[key].forEach(cat => formData.append('category', cat));
-        } else if (key === 'brand') {
+      Object.keys(updateFormData).forEach((key) => {
+        if (key === "images" || key === "removeImages" || key === "newBrand")
+          return;
+        if (key === "category") {
+          updateFormData[key].forEach((cat) =>
+            formData.append("category", cat)
+          );
+        } else if (key === "brand") {
           formData.append(key, brandValue);
         } else {
           formData.append(key, updateFormData[key]);
@@ -407,59 +426,67 @@ const Notebooks = () => {
       });
 
       // Append images to remove
-      updateFormData.removeImages.forEach(imagePath => {
-        formData.append('removeImages', imagePath);
+      updateFormData.removeImages.forEach((imagePath) => {
+        formData.append("removeImages", imagePath);
       });
 
       // Append new image files
-      updateFormData.images.forEach(image => {
-        if (typeof image === 'object') {
-          formData.append('images', image);
+      updateFormData.images.forEach((image) => {
+        if (typeof image === "object") {
+          formData.append("images", image);
         }
       });
 
-      const response = await fetch(`${baseURL}/products/${currentNotebook._id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
+      const response = await fetch(
+        `${baseURL}/products/${currentNotebook._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update notebook');
+        throw new Error(errorData.message || "Failed to update notebook");
       }
 
       const updatedNotebook = await response.json();
-      setNotebooks(products.map(product =>
-        product._id === currentNotebook._id ? updatedNotebook.data : product
-      ));
+      setNotebooks(
+        products.map((product) =>
+          product._id === currentNotebook._id ? updatedNotebook.data : product
+        )
+      );
 
       Swal.fire({
-        title: 'Success!',
-        text: 'Notebook updated successfully.',
-        icon: 'success',
-        confirmButtonColor: '#222222'
+        title: "Success!",
+        text: "Notebook updated successfully.",
+        icon: "success",
+        confirmButtonColor: "#222222",
       });
 
       handleCloseModals();
     } catch (err) {
-      console.error('Error updating product:', err);
+      console.error("Error updating product:", err);
       Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to update notebook. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#222222'
+        title: "Error!",
+        text: err.message || "Failed to update notebook. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#222222",
       });
     }
   };
 
   // Filter products based on search term
-  const filteredNotebooks = products.filter(product =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.some(cat => cat.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredNotebooks = products.filter(
+    (product) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.some((cat) =>
+        cat.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   // Handle page change
@@ -471,17 +498,17 @@ const Notebooks = () => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   // Calculate discounted price
   const getDiscountedPrice = (product) => {
     if (product.discount > 0) {
-      if (product.discountType === 'percentage') {
-        return product.price - (product.price * product.discount / 100);
+      if (product.discountType === "percentage") {
+        return product.price - (product.price * product.discount) / 100;
       } else {
         return product.price - product.discount;
       }
@@ -505,8 +532,17 @@ const Notebooks = () => {
         <div className="bg-red-50 border-l-4 border-red-400 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -524,14 +560,27 @@ const Notebooks = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Notebook Management</h1>
-            <p className="mt-1 text-sm text-gray-600">Manage all notebook products in your store</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Notebook Management
+            </h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Manage all notebook products in your store
+            </p>
           </div>
           <div className="mt-4 md:mt-0 flex space-x-3">
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <input
@@ -546,8 +595,17 @@ const Notebooks = () => {
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               onClick={handleOpenCreateModal}
             >
-              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              <svg
+                className="-ml-1 mr-2 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               Add Notebook
             </button>
@@ -560,25 +618,46 @@ const Notebooks = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Notebook
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Category
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Price
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Stock
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Brand
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Rating
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Actions
                   </th>
                 </tr>
@@ -597,22 +676,38 @@ const Notebooks = () => {
                               {product.images && product.images.length > 0 ? (
                                 <img
                                   className="h-10 w-10 rounded-md object-cover"
-                                  src={resolveProductImageUrl(baseURL, product.images[0])}
+                                  src={resolveProductImageUrl(
+                                    baseURL,
+                                    product.images[0]
+                                  )}
                                   alt={product.title}
                                 />
                               ) : (
                                 <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
-                                  <svg className="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  <svg
+                                    className="h-6 w-6 text-gray-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
                                   </svg>
                                 </div>
                               )}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{product.title}</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {product.title}
+                              </div>
                               <div className="text-sm text-gray-500">
                                 {product.sizes && product.sizes.length > 0 && (
-                                  <span>{product.sizes.join(', ')}</span>
+                                  <span>{product.sizes.join(", ")}</span>
                                 )}
                               </div>
                             </div>
@@ -622,11 +717,16 @@ const Notebooks = () => {
                           <div className="text-sm text-gray-900">
                             {product.category && product.category.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
-                                {product.category.slice(0, 2).map((cat, index) => (
-                                  <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {cat}
-                                  </span>
-                                ))}
+                                {product.category
+                                  .slice(0, 2)
+                                  .map((cat, index) => (
+                                    <span
+                                      key={index}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                    >
+                                      {cat}
+                                    </span>
+                                  ))}
                                 {product.category.length > 2 && (
                                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                     +{product.category.length - 2}
@@ -642,10 +742,17 @@ const Notebooks = () => {
                           <div className="text-sm text-gray-900">
                             {hasDiscount ? (
                               <>
-                                <span className="line-through text-gray-500">{formatCurrency(product.price)}</span>
-                                <span className="ml-2 font-medium">{formatCurrency(discountedPrice)}</span>
+                                <span className="line-through text-gray-500">
+                                  {formatCurrency(product.price)}
+                                </span>
+                                <span className="ml-2 font-medium">
+                                  {formatCurrency(discountedPrice)}
+                                </span>
                                 <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                  {product.discountType === 'percentage' ? `${product.discount}%` : formatCurrency(product.discount)} OFF
+                                  {product.discountType === "percentage"
+                                    ? `${product.discount}%`
+                                    : formatCurrency(product.discount)}{" "}
+                                  OFF
                                 </span>
                               </>
                             ) : (
@@ -654,11 +761,16 @@ const Notebooks = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.inStock
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                            }`}>
-                            {product.inStock ? `${product.stockQuantity} in stock` : 'Out of stock'}
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              product.inStock
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {product.inStock
+                              ? `${product.stockQuantity} in stock`
+                              : "Out of stock"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -670,7 +782,7 @@ const Notebooks = () => {
                               {[...Array(5)].map((_, i) => (
                                 <svg
                                   key={i}
-                                  className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-700 p-2'}`}
+                                  className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-yellow-400" : "text-gray-700 p-2"}`}
                                   xmlns="http://www.w3.org/2000/svg"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
@@ -691,9 +803,18 @@ const Notebooks = () => {
                               className="text-gray-600 hover:text-gray-900 transition-colors"
                               title="View Details"
                             >
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <svg
+                                className="h-5 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </button>
                             <button
@@ -701,17 +822,33 @@ const Notebooks = () => {
                               className="text-primary hover:text-primary transition-colors"
                               title="Edit Notebook"
                             >
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <svg
+                                className="h-5 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                               </svg>
                             </button>
                             <button
-                              onClick={() => handleDeleteNotebook(product._id, product.title)}
+                              onClick={() =>
+                                handleDeleteNotebook(product._id, product.title)
+                              }
                               className="text-red-600 hover:text-red-900 transition-colors"
                               title="Delete Notebook"
                             >
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              <svg
+                                className="h-5 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </button>
                           </div>
@@ -721,8 +858,13 @@ const Notebooks = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                      {searchTerm ? 'No notebooks found matching your search.' : 'No notebooks found.'}
+                    <td
+                      colSpan="7"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      {searchTerm
+                        ? "No notebooks found matching your search."
+                        : "No notebooks found."}
                     </td>
                   </tr>
                 )}
@@ -736,20 +878,22 @@ const Notebooks = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-4 py-2 border border border-gray-700 p-2 text-sm font-medium rounded-md ${currentPage === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
+                className={`relative inline-flex items-center px-4 py-2 border border border-gray-700 p-2 text-sm font-medium rounded-md ${
+                  currentPage === 1
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
               >
                 Previous
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`ml-3 relative inline-flex items-center px-4 py-2 border border border-gray-700 p-2 text-sm font-medium rounded-md ${currentPage === totalPages
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
+                className={`ml-3 relative inline-flex items-center px-4 py-2 border border border-gray-700 p-2 text-sm font-medium rounded-md ${
+                  currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
               >
                 Next
               </button>
@@ -757,26 +901,44 @@ const Notebooks = () => {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{(currentPage - 1) * limit + 1}</span> to{' '}
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * limit + 1}
+                  </span>{" "}
+                  to{" "}
                   <span className="font-medium">
                     {Math.min(currentPage * limit, products.length)}
-                  </span>{' '}
-                  of <span className="font-medium">{products.length}</span> notebooks
+                  </span>{" "}
+                  of <span className="font-medium">{products.length}</span>{" "}
+                  notebooks
                 </p>
               </div>
               <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <nav
+                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                  aria-label="Pagination"
+                >
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border border-gray-700 p-2 text-sm font-medium ${currentPage === 1
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-500 hover:bg-gray-50'
-                      }`}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border border-gray-700 p-2 text-sm font-medium ${
+                      currentPage === 1
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "bg-white text-gray-500 hover:bg-gray-50"
+                    }`}
                   >
                     <span className="sr-only">Previous</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
 
@@ -786,10 +948,11 @@ const Notebooks = () => {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
-                          ? 'z-10 bg-primary border-primary text-white'
-                          : 'bg-white border border-gray-700 p-2 text-gray-500 hover:bg-gray-50'
-                          }`}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page
+                            ? "z-10 bg-primary border-primary text-white"
+                            : "bg-white border border-gray-700 p-2 text-gray-500 hover:bg-gray-50"
+                        }`}
                       >
                         {page}
                       </button>
@@ -799,14 +962,24 @@ const Notebooks = () => {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border border-gray-700 p-2 text-sm font-medium ${currentPage === totalPages
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-500 hover:bg-gray-50'
-                      }`}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border border-gray-700 p-2 text-sm font-medium ${
+                      currentPage === totalPages
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "bg-white text-gray-500 hover:bg-gray-50"
+                    }`}
                   >
                     <span className="sr-only">Next</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                 </nav>
@@ -820,14 +993,22 @@ const Notebooks = () => {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
               <div
                 className="absolute inset-0 bg-gray-500 opacity-75"
                 onClick={handleCloseModals}
               ></div>
             </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
 
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -837,11 +1018,17 @@ const Notebooks = () => {
                       Create New Notebook
                     </h3>
                     <div className="mt-4">
-                      <form onSubmit={handleCreateSubmit} encType="multipart/form-data">
+                      <form
+                        onSubmit={handleCreateSubmit}
+                        encType="multipart/form-data"
+                      >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <div className="mb-4">
-                              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="title"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Notebook Title *
                               </label>
                               <input
@@ -856,7 +1043,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="description"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Description *
                               </label>
                               <textarea
@@ -871,7 +1061,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="price"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Price ($) *
                               </label>
                               <input
@@ -888,7 +1081,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="brand"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Brand
                               </label>
                               <select
@@ -900,16 +1096,18 @@ const Notebooks = () => {
                               >
                                 <option value="">Select a brand</option>
                                 {brands.map((brand, index) => (
-                                  <option key={index} value={brand}>{brand}</option>
+                                  <option key={index} value={brand}>
+                                    {brand}
+                                  </option>
                                 ))}
                                 <option value="new">Add New Brand</option>
                               </select>
-                              {createFormData.brand === 'new' && (
+                              {createFormData.brand === "new" && (
                                 <input
                                   type="text"
                                   name="newBrand"
                                   placeholder="Enter new brand"
-                                  value={createFormData.newBrand || ''}
+                                  value={createFormData.newBrand || ""}
                                   className="mt-2 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border border-gray-700 p-2 rounded-md"
                                   onChange={handleCreateInputChange}
                                 />
@@ -917,7 +1115,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="category"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Categories
                               </label>
                               <select
@@ -929,16 +1130,23 @@ const Notebooks = () => {
                                 className="mt-1 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border border-gray-700 p-2 rounded-md h-32"
                               >
                                 {categories.map((category, index) => (
-                                  <option key={index} value={category}>{category}</option>
+                                  <option key={index} value={category}>
+                                    {category}
+                                  </option>
                                 ))}
                               </select>
-                              <p className="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple</p>
+                              <p className="mt-1 text-sm text-gray-500">
+                                Hold Ctrl/Cmd to select multiple
+                              </p>
                             </div>
                           </div>
 
                           <div>
                             <div className="mb-4">
-                              <label htmlFor="sizes" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="sizes"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Sizes (comma separated)
                               </label>
                               <input
@@ -953,7 +1161,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="colors" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="colors"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Colors (comma separated)
                               </label>
                               <input
@@ -968,7 +1179,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="tags"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Tags (comma separated)
                               </label>
                               <input
@@ -983,7 +1197,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="stockQuantity" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="stockQuantity"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Stock Quantity
                               </label>
                               <input
@@ -1006,13 +1223,19 @@ const Notebooks = () => {
                                 onChange={handleCreateInputChange}
                                 className="focus:ring-primary h-4 w-4 text-primary border border-gray-700 p-2 rounded"
                               />
-                              <label htmlFor="inStock" className="ml-2 block text-sm text-gray-700">
+                              <label
+                                htmlFor="inStock"
+                                className="ml-2 block text-sm text-gray-700"
+                              >
                                 In Stock
                               </label>
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="discount" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="discount"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Discount
                               </label>
                               <div className="flex">
@@ -1033,13 +1256,18 @@ const Notebooks = () => {
                                   className="mt-1 focus:ring-primary focus:border-primary block shadow-sm sm:text-sm border border-gray-700 p-2 rounded-r-md"
                                 >
                                   <option value="fixed">Fixed ($)</option>
-                                  <option value="percentage">Percentage (%)</option>
+                                  <option value="percentage">
+                                    Percentage (%)
+                                  </option>
                                 </select>
                               </div>
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="rating" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="rating"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Rating (0-5)
                               </label>
                               <input
@@ -1056,7 +1284,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="numReviews" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="numReviews"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Number of Reviews
                               </label>
                               <input
@@ -1078,11 +1309,25 @@ const Notebooks = () => {
                           </label>
                           <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border border-gray-700 p-2 border-dashed rounded-md">
                             <div className="space-y-1 text-center">
-                              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              <svg
+                                className="mx-auto h-12 w-12 text-gray-400"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                               <div className="flex text-sm text-gray-600">
-                                <label htmlFor="create-images" className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                                <label
+                                  htmlFor="create-images"
+                                  className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                                >
                                   <span>Upload files</span>
                                   <input
                                     id="create-images"
@@ -1137,14 +1382,22 @@ const Notebooks = () => {
       {showUpdateModal && currentNotebook && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
               <div
                 className="absolute inset-0 bg-gray-500 opacity-75"
                 onClick={handleCloseModals}
               ></div>
             </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
 
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -1154,11 +1407,17 @@ const Notebooks = () => {
                       Update Notebook: {currentNotebook.title}
                     </h3>
                     <div className="mt-4">
-                      <form onSubmit={handleUpdateSubmit} encType="multipart/form-data">
+                      <form
+                        onSubmit={handleUpdateSubmit}
+                        encType="multipart/form-data"
+                      >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <div className="mb-4">
-                              <label htmlFor="update-title" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-title"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Notebook Title *
                               </label>
                               <input
@@ -1173,7 +1432,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-description" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-description"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Description *
                               </label>
                               <textarea
@@ -1188,7 +1450,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-price" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-price"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Price ($) *
                               </label>
                               <input
@@ -1205,7 +1470,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-brand" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-brand"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Brand
                               </label>
                               <select
@@ -1217,16 +1485,18 @@ const Notebooks = () => {
                               >
                                 <option value="">Select a brand</option>
                                 {brands.map((brand, index) => (
-                                  <option key={index} value={brand}>{brand}</option>
+                                  <option key={index} value={brand}>
+                                    {brand}
+                                  </option>
                                 ))}
                                 <option value="new">Add New Brand</option>
                               </select>
-                              {updateFormData.brand === 'new' && (
+                              {updateFormData.brand === "new" && (
                                 <input
                                   type="text"
                                   name="newBrand"
                                   placeholder="Enter new brand"
-                                  value={updateFormData.newBrand || ''}
+                                  value={updateFormData.newBrand || ""}
                                   className="mt-2 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border border-gray-700 p-2 rounded-md"
                                   onChange={handleUpdateInputChange}
                                 />
@@ -1234,7 +1504,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-category" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-category"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Categories
                               </label>
                               <select
@@ -1246,16 +1519,23 @@ const Notebooks = () => {
                                 className="mt-1 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border border-gray-700 p-2 rounded-md h-32"
                               >
                                 {categories.map((category, index) => (
-                                  <option key={index} value={category}>{category}</option>
+                                  <option key={index} value={category}>
+                                    {category}
+                                  </option>
                                 ))}
                               </select>
-                              <p className="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple</p>
+                              <p className="mt-1 text-sm text-gray-500">
+                                Hold Ctrl/Cmd to select multiple
+                              </p>
                             </div>
                           </div>
 
                           <div>
                             <div className="mb-4">
-                              <label htmlFor="update-sizes" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-sizes"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Sizes (comma separated)
                               </label>
                               <input
@@ -1270,7 +1550,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-colors" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-colors"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Colors (comma separated)
                               </label>
                               <input
@@ -1285,7 +1568,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-tags" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-tags"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Tags (comma separated)
                               </label>
                               <input
@@ -1300,7 +1586,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-stockQuantity" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-stockQuantity"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Stock Quantity
                               </label>
                               <input
@@ -1323,13 +1612,19 @@ const Notebooks = () => {
                                 onChange={handleUpdateInputChange}
                                 className="focus:ring-primary h-4 w-4 text-primary border border-gray-700 p-2 rounded"
                               />
-                              <label htmlFor="update-inStock" className="ml-2 block text-sm text-gray-700">
+                              <label
+                                htmlFor="update-inStock"
+                                className="ml-2 block text-sm text-gray-700"
+                              >
                                 In Stock
                               </label>
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-discount" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-discount"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Discount
                               </label>
                               <div className="flex">
@@ -1350,13 +1645,18 @@ const Notebooks = () => {
                                   className="mt-1 focus:ring-primary focus:border-primary block shadow-sm sm:text-sm border border-gray-700 p-2 rounded-r-md"
                                 >
                                   <option value="fixed">Fixed ($)</option>
-                                  <option value="percentage">Percentage (%)</option>
+                                  <option value="percentage">
+                                    Percentage (%)
+                                  </option>
                                 </select>
                               </div>
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-rating" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-rating"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Rating (0-5)
                               </label>
                               <input
@@ -1373,7 +1673,10 @@ const Notebooks = () => {
                             </div>
 
                             <div className="mb-4">
-                              <label htmlFor="update-numReviews" className="block text-sm font-medium text-gray-700">
+                              <label
+                                htmlFor="update-numReviews"
+                                className="block text-sm font-medium text-gray-700"
+                              >
                                 Number of Reviews
                               </label>
                               <input
@@ -1396,7 +1699,7 @@ const Notebooks = () => {
                           <div className="mt-2 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                             {updateFormData.images.map((image, index) => (
                               <div key={index} className="relative">
-                                {typeof image === 'string' ? (
+                                {typeof image === "string" ? (
                                   <img
                                     src={resolveProductImageUrl(baseURL, image)}
                                     alt={`Notebook ${index}`}
@@ -1404,8 +1707,19 @@ const Notebooks = () => {
                                   />
                                 ) : (
                                   <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
-                                    <svg className="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg
+                                      className="h-6 w-6 text-gray-400"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      />
                                     </svg>
                                   </div>
                                 )}
@@ -1414,8 +1728,17 @@ const Notebooks = () => {
                                   onClick={() => handleRemoveImage(image)}
                                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                                 >
-                                  <svg className="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  <svg
+                                    className="h-3 w-3"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                      clipRule="evenodd"
+                                    />
                                   </svg>
                                 </button>
                               </div>
@@ -1429,11 +1752,25 @@ const Notebooks = () => {
                           </label>
                           <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border border-gray-700 p-2 border-dashed rounded-md">
                             <div className="space-y-1 text-center">
-                              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              <svg
+                                className="mx-auto h-12 w-12 text-gray-400"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                               <div className="flex text-sm text-gray-600">
-                                <label htmlFor="update-images" className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                                <label
+                                  htmlFor="update-images"
+                                  className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                                >
                                   <span>Upload files</span>
                                   <input
                                     id="update-images"
@@ -1483,14 +1820,22 @@ const Notebooks = () => {
       {showDetailsModal && selectedNotebookDetails && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
               <div
                 className="absolute inset-0 bg-gray-500 opacity-75"
                 onClick={handleCloseModals}
               ></div>
             </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
 
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -1505,8 +1850,19 @@ const Notebooks = () => {
                         onClick={handleCloseModals}
                         className="text-gray-400 hover:text-gray-500 focus:outline-none"
                       >
-                        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -1514,21 +1870,37 @@ const Notebooks = () => {
                     <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Notebook Images */}
                       <div>
-                        <h4 className="text-md font-medium text-gray-900 mb-3">Notebook Images</h4>
+                        <h4 className="text-md font-medium text-gray-900 mb-3">
+                          Notebook Images
+                        </h4>
                         <div className="grid grid-cols-2 gap-2">
-                          {selectedNotebookDetails.images && selectedNotebookDetails.images.length > 0 ? (
-                            selectedNotebookDetails.images.map((image, index) => (
-                              <img
-                                key={index}
-                                src={resolveProductImageUrl(baseURL, image)}
-                                alt={`Notebook ${index + 1}`}
-                                className="rounded-md object-cover w-full h-40"
-                              />
-                            ))
+                          {selectedNotebookDetails.images &&
+                          selectedNotebookDetails.images.length > 0 ? (
+                            selectedNotebookDetails.images.map(
+                              (image, index) => (
+                                <img
+                                  key={index}
+                                  src={resolveProductImageUrl(baseURL, image)}
+                                  alt={`Notebook ${index + 1}`}
+                                  className="rounded-md object-cover w-full h-40"
+                                />
+                              )
+                            )
                           ) : (
                             <div className="col-span-2 h-40 bg-gray-200 rounded-md flex items-center justify-center">
-                              <svg className="h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <svg
+                                className="h-12 w-12 text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
                               </svg>
                             </div>
                           )}
@@ -1537,36 +1909,59 @@ const Notebooks = () => {
 
                       {/* Notebook Information */}
                       <div>
-                        <h4 className="text-md font-medium text-gray-900 mb-3">Notebook Information</h4>
+                        <h4 className="text-md font-medium text-gray-900 mb-3">
+                          Notebook Information
+                        </h4>
                         <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                           <div>
-                            <h5 className="text-sm font-medium text-gray-900">Title</h5>
-                            <p className="text-sm text-gray-600">{selectedNotebookDetails.title}</p>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              Title
+                            </h5>
+                            <p className="text-sm text-gray-600">
+                              {selectedNotebookDetails.title}
+                            </p>
                           </div>
 
                           <div>
-                            <h5 className="text-sm font-medium text-gray-900">Description</h5>
-                            <p className="text-sm text-gray-600">{selectedNotebookDetails.description}</p>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              Description
+                            </h5>
+                            <p className="text-sm text-gray-600">
+                              {selectedNotebookDetails.description}
+                            </p>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Price</h5>
-                              <p className="text-sm text-gray-600">{formatCurrency(selectedNotebookDetails.price)}</p>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Price
+                              </h5>
+                              <p className="text-sm text-gray-600">
+                                {formatCurrency(selectedNotebookDetails.price)}
+                              </p>
                             </div>
 
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Brand</h5>
-                              <p className="text-sm text-gray-600">{selectedNotebookDetails.brand}</p>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Brand
+                              </h5>
+                              <p className="text-sm text-gray-600">
+                                {selectedNotebookDetails.brand}
+                              </p>
                             </div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">In Stock</h5>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                In Stock
+                              </h5>
                               <p className="text-sm text-gray-600">
                                 {selectedNotebookDetails.inStock ? (
-                                  <span className="text-green-600">Yes ({selectedNotebookDetails.stockQuantity} items)</span>
+                                  <span className="text-green-600">
+                                    Yes ({selectedNotebookDetails.stockQuantity}{" "}
+                                    items)
+                                  </span>
                                 ) : (
                                   <span className="text-red-600">No</span>
                                 )}
@@ -1574,13 +1969,15 @@ const Notebooks = () => {
                             </div>
 
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Rating</h5>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Rating
+                              </h5>
                               <div className="flex items-center">
                                 <div className="flex items-center">
                                   {[...Array(5)].map((_, i) => (
                                     <svg
                                       key={i}
-                                      className={`w-4 h-4 ${i < Math.floor(selectedNotebookDetails.rating) ? 'text-yellow-400' : 'text-gray-700 p-2'}`}
+                                      className={`w-4 h-4 ${i < Math.floor(selectedNotebookDetails.rating) ? "text-yellow-400" : "text-gray-700 p-2"}`}
                                       xmlns="http://www.w3.org/2000/svg"
                                       viewBox="0 0 20 20"
                                       fill="currentColor"
@@ -1590,54 +1987,85 @@ const Notebooks = () => {
                                   ))}
                                 </div>
                                 <span className="ml-1 text-sm text-gray-600">
-                                  {selectedNotebookDetails.rating} ({selectedNotebookDetails.numReviews} reviews)
+                                  {selectedNotebookDetails.rating} (
+                                  {selectedNotebookDetails.numReviews} reviews)
                                 </span>
                               </div>
                             </div>
                           </div>
 
                           <div>
-                            <h5 className="text-sm font-medium text-gray-900">Categories</h5>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              Categories
+                            </h5>
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {selectedNotebookDetails.category && selectedNotebookDetails.category.length > 0 ? (
-                                selectedNotebookDetails.category.map((cat, index) => (
-                                  <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {cat}
-                                  </span>
-                                ))
+                              {selectedNotebookDetails.category &&
+                              selectedNotebookDetails.category.length > 0 ? (
+                                selectedNotebookDetails.category.map(
+                                  (cat, index) => (
+                                    <span
+                                      key={index}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                    >
+                                      {cat}
+                                    </span>
+                                  )
+                                )
                               ) : (
-                                <span className="text-sm text-gray-600">No categories</span>
+                                <span className="text-sm text-gray-600">
+                                  No categories
+                                </span>
                               )}
                             </div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Sizes</h5>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Sizes
+                              </h5>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {selectedNotebookDetails.sizes && selectedNotebookDetails.sizes.length > 0 ? (
-                                  selectedNotebookDetails.sizes.map((size, index) => (
-                                    <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                      {size}
-                                    </span>
-                                  ))
+                                {selectedNotebookDetails.sizes &&
+                                selectedNotebookDetails.sizes.length > 0 ? (
+                                  selectedNotebookDetails.sizes.map(
+                                    (size, index) => (
+                                      <span
+                                        key={index}
+                                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                      >
+                                        {size}
+                                      </span>
+                                    )
+                                  )
                                 ) : (
-                                  <span className="text-sm text-gray-600">No sizes</span>
+                                  <span className="text-sm text-gray-600">
+                                    No sizes
+                                  </span>
                                 )}
                               </div>
                             </div>
 
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Colors</h5>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Colors
+                              </h5>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {selectedNotebookDetails.colors && selectedNotebookDetails.colors.length > 0 ? (
-                                  selectedNotebookDetails.colors.map((color, index) => (
-                                    <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/40 text-primary">
-                                      {color}
-                                    </span>
-                                  ))
+                                {selectedNotebookDetails.colors &&
+                                selectedNotebookDetails.colors.length > 0 ? (
+                                  selectedNotebookDetails.colors.map(
+                                    (color, index) => (
+                                      <span
+                                        key={index}
+                                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/40 text-primary"
+                                      >
+                                        {color}
+                                      </span>
+                                    )
+                                  )
                                 ) : (
-                                  <span className="text-sm text-gray-600">No colors</span>
+                                  <span className="text-sm text-gray-600">
+                                    No colors
+                                  </span>
                                 )}
                               </div>
                             </div>
@@ -1645,26 +2073,42 @@ const Notebooks = () => {
 
                           {selectedNotebookDetails.discount > 0 && (
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900">Discount</h5>
+                              <h5 className="text-sm font-medium text-gray-900">
+                                Discount
+                              </h5>
                               <p className="text-sm text-gray-600">
-                                {selectedNotebookDetails.discountType === 'percentage'
+                                {selectedNotebookDetails.discountType ===
+                                "percentage"
                                   ? `${selectedNotebookDetails.discount}%`
-                                  : formatCurrency(selectedNotebookDetails.discount)} OFF
+                                  : formatCurrency(
+                                      selectedNotebookDetails.discount
+                                    )}{" "}
+                                OFF
                               </p>
                             </div>
                           )}
 
                           <div>
-                            <h5 className="text-sm font-medium text-gray-900">Tags</h5>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              Tags
+                            </h5>
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {selectedNotebookDetails.tags && selectedNotebookDetails.tags.length > 0 ? (
-                                selectedNotebookDetails.tags.map((tag, index) => (
-                                  <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    {tag}
-                                  </span>
-                                ))
+                              {selectedNotebookDetails.tags &&
+                              selectedNotebookDetails.tags.length > 0 ? (
+                                selectedNotebookDetails.tags.map(
+                                  (tag, index) => (
+                                    <span
+                                      key={index}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                    >
+                                      {tag}
+                                    </span>
+                                  )
+                                )
                               ) : (
-                                <span className="text-sm text-gray-600">No tags</span>
+                                <span className="text-sm text-gray-600">
+                                  No tags
+                                </span>
                               )}
                             </div>
                           </div>
@@ -1693,6 +2137,3 @@ const Notebooks = () => {
 };
 
 export default Notebooks;
-
-
-

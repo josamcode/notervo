@@ -34,7 +34,7 @@ const Categories = () => {
   const [updateImagePreview, setUpdateImagePreview] = useState("");
 
   const token = Cookies.get("token");
-  const baseURL = process.env.REACT_APP_API_URL;
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -277,9 +277,7 @@ const Categories = () => {
         throw new Error(data.message || "Failed to delete category");
       }
 
-      setCategories((prev) =>
-        prev.filter((item) => item._id !== category._id)
-      );
+      setCategories((prev) => prev.filter((item) => item._id !== category._id));
 
       Swal.fire({
         title: "Deleted",

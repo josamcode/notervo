@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import Layout from '../components/Layout';
-import Cookies from 'js-cookie';
+import React, { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import Layout from "../components/Layout";
+import Cookies from "js-cookie";
 import {
   HiOutlineCube,
   HiOutlineUserGroup,
@@ -9,17 +23,53 @@ import {
   HiOutlineTicket,
   HiOutlineMail,
   HiOutlineChat,
-  HiOutlineUser
-} from 'react-icons/hi';
+  HiOutlineUser,
+} from "react-icons/hi";
 
 const Dashboard = () => {
   const [stats, setStats] = useState([
-    { name: 'Total Notebooks', value: 0, icon: HiOutlineCube, color: 'bg-primary', change: '+0%' },
-    { name: 'Total Users', value: 0, icon: HiOutlineUserGroup, color: 'bg-[#3A3A3A]', change: '+0%' },
-    { name: 'Total Orders', value: 0, icon: HiOutlineShoppingCart, color: 'bg-[#4A4A4A]', change: '+0%' },
-    { name: 'Active Coupons', value: 0, icon: HiOutlineTicket, color: 'bg-[#5A5A5A]', change: '+0%' },
-    { name: 'Subscribers', value: 0, icon: HiOutlineMail, color: 'bg-[#6A6A6A]', change: '+0%' },
-    { name: 'Messages', value: 0, icon: HiOutlineChat, color: 'bg-[#7A7A7A]', change: '+0%' },
+    {
+      name: "Total Notebooks",
+      value: 0,
+      icon: HiOutlineCube,
+      color: "bg-primary",
+      change: "+0%",
+    },
+    {
+      name: "Total Users",
+      value: 0,
+      icon: HiOutlineUserGroup,
+      color: "bg-[#3A3A3A]",
+      change: "+0%",
+    },
+    {
+      name: "Total Orders",
+      value: 0,
+      icon: HiOutlineShoppingCart,
+      color: "bg-[#4A4A4A]",
+      change: "+0%",
+    },
+    {
+      name: "Active Coupons",
+      value: 0,
+      icon: HiOutlineTicket,
+      color: "bg-[#5A5A5A]",
+      change: "+0%",
+    },
+    {
+      name: "Subscribers",
+      value: 0,
+      icon: HiOutlineMail,
+      color: "bg-[#6A6A6A]",
+      change: "+0%",
+    },
+    {
+      name: "Messages",
+      value: 0,
+      icon: HiOutlineChat,
+      color: "bg-[#7A7A7A]",
+      change: "+0%",
+    },
   ]);
 
   const [ordersData, setOrdersData] = useState([]);
@@ -29,11 +79,13 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const token = Cookies.get('token');
-  const baseURL = process.env.REACT_APP_API_URL;
+  const token = Cookies.get("token");
+  const baseURL = import.meta.env.VITE_API_URL;
   const getOrderDisplayId = (order) => {
     if (order?.orderNumber) return order.orderNumber;
-    return `NTV-${String(order?._id || '').slice(-6).toUpperCase()}`;
+    return `NTV-${String(order?._id || "")
+      .slice(-6)
+      .toUpperCase()}`;
   };
 
   useEffect(() => {
@@ -48,26 +100,26 @@ const Dashboard = () => {
           ordersRes,
           couponsRes,
           messagesRes,
-          subscribersRes
+          subscribersRes,
         ] = await Promise.all([
           fetch(`${baseURL}/products`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${baseURL}/users`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${baseURL}/orders/all`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${baseURL}/coupons`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${baseURL}/messages`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${baseURL}/subscribers`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         const productsData = await productsRes.json();
@@ -87,7 +139,7 @@ const Dashboard = () => {
           updatedStats[5].value = messagesData.count || 0;
 
           updatedStats.forEach((stat) => {
-            stat.change = '+0%';
+            stat.change = "+0%";
           });
 
           return updatedStats;
@@ -95,27 +147,27 @@ const Dashboard = () => {
 
         if (ordersData.orders && ordersData.orders.length > 0) {
           const ordersByMonth = {};
-          ordersData.orders.forEach(order => {
+          ordersData.orders.forEach((order) => {
             const date = new Date(order.createdAt);
-            const month = date.toLocaleString('default', { month: 'short' });
+            const month = date.toLocaleString("default", { month: "short" });
             ordersByMonth[month] = (ordersByMonth[month] || 0) + 1;
           });
 
-          const ordersChartData = Object.keys(ordersByMonth).map(month => ({
+          const ordersChartData = Object.keys(ordersByMonth).map((month) => ({
             name: month,
-            orders: ordersByMonth[month]
+            orders: ordersByMonth[month],
           }));
 
           setOrdersData(ordersChartData);
 
           const statusCount = {};
-          ordersData.orders.forEach(order => {
+          ordersData.orders.forEach((order) => {
             statusCount[order.state] = (statusCount[order.state] || 0) + 1;
           });
 
-          const statusChartData = Object.keys(statusCount).map(status => ({
+          const statusChartData = Object.keys(statusCount).map((status) => ({
             name: status.charAt(0).toUpperCase() + status.slice(1),
-            value: statusCount[status]
+            value: statusCount[status],
           }));
 
           setOrderStatusData(statusChartData);
@@ -123,17 +175,19 @@ const Dashboard = () => {
 
         if (productsData.data && productsData.data.length > 0) {
           const categoryCount = {};
-          productsData.data.forEach(product => {
+          productsData.data.forEach((product) => {
             if (product.category && product.category.length > 0) {
               const category = product.category[0];
               categoryCount[category] = (categoryCount[category] || 0) + 1;
             }
           });
 
-          const productsChartData = Object.keys(categoryCount).map(category => ({
-            name: category,
-            value: categoryCount[category]
-          }));
+          const productsChartData = Object.keys(categoryCount).map(
+            (category) => ({
+              name: category,
+              value: categoryCount[category],
+            })
+          );
 
           setProductsData(productsChartData);
         }
@@ -147,16 +201,16 @@ const Dashboard = () => {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3);
 
-          recentUsers.forEach(user => {
+          recentUsers.forEach((user) => {
             activity.push({
               id: user._id,
-              type: 'user',
-              title: 'New user registered',
+              type: "user",
+              title: "New user registered",
               description: user.username,
               time: user.createdAt,
               icon: HiOutlineUser,
-              iconColor: 'bg-secondary/40',
-              iconTextColor: 'text-primary'
+              iconColor: "bg-secondary/40",
+              iconTextColor: "text-primary",
             });
           });
         }
@@ -167,16 +221,16 @@ const Dashboard = () => {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3);
 
-          recentOrders.forEach(order => {
+          recentOrders.forEach((order) => {
             activity.push({
               id: order._id,
-              type: 'order',
-              title: 'New order placed',
+              type: "order",
+              title: "New order placed",
               description: `Order #${getOrderDisplayId(order)}`,
               time: order.createdAt,
               icon: HiOutlineShoppingCart,
-              iconColor: 'bg-secondary/40',
-              iconTextColor: 'text-primary'
+              iconColor: "bg-secondary/40",
+              iconTextColor: "text-primary",
             });
           });
         }
@@ -187,16 +241,16 @@ const Dashboard = () => {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3);
 
-          recentCoupons.forEach(coupon => {
+          recentCoupons.forEach((coupon) => {
             activity.push({
               id: coupon._id,
-              type: 'coupon',
-              title: 'New coupon created',
+              type: "coupon",
+              title: "New coupon created",
               description: coupon.coupon,
               time: coupon.createdAt,
               icon: HiOutlineTicket,
-              iconColor: 'bg-secondary/40',
-              iconTextColor: 'text-primary'
+              iconColor: "bg-secondary/40",
+              iconTextColor: "text-primary",
             });
           });
         }
@@ -207,10 +261,9 @@ const Dashboard = () => {
           .slice(0, 4);
 
         setRecentActivity(sortedActivity);
-
       } catch (err) {
-        setError('Failed to load dashboard data');
-        console.error('Dashboard data fetch error:', err);
+        setError("Failed to load dashboard data");
+        console.error("Dashboard data fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -256,7 +309,7 @@ const Dashboard = () => {
   };
 
   // Colors for charts
-  const COLORS = ['#222222', '#4A4A4A', '#6B6B6B', '#8A8A8A', '#B0B0B0'];
+  const COLORS = ["#222222", "#4A4A4A", "#6B6B6B", "#8A8A8A", "#B0B0B0"];
   if (loading) {
     return (
       <Layout>
@@ -273,8 +326,17 @@ const Dashboard = () => {
         <div className="bg-red-50 border-l-4 border-red-400 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -291,7 +353,9 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Dashboard Overview
+          </h1>
           <div className="text-sm text-gray-500">
             Last updated: {new Date().toLocaleString()}
           </div>
@@ -302,21 +366,39 @@ const Dashboard = () => {
           {stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+              >
                 <div className="p-6">
                   <div className="flex items-center">
                     <div className={`${stat.color} p-3 rounded-lg`}>
                       <IconComponent className="h-6 w-6 text-white" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                      <p className="text-sm font-medium text-gray-600">
+                        {stat.name}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {stat.value}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-4">
                     <span className="inline-flex items-center text-sm text-green-600">
-                      <svg className="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      <svg
+                        className="h-4 w-4 mr-1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 15l7-7 7 7"
+                        />
                       </svg>
                       {stat.change} from last month
                     </span>
@@ -331,7 +413,9 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Orders Chart */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Orders Trend</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Orders Trend
+            </h3>
             <div className="h-80">
               {ordersData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -360,7 +444,9 @@ const Dashboard = () => {
 
           {/* Products Distribution */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Notebooks by Category</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Notebooks by Category
+            </h3>
             <div className="h-80">
               {productsData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -373,10 +459,15 @@ const Dashboard = () => {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
                     >
                       {productsData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -396,7 +487,9 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Order Status */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Distribution</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Order Status Distribution
+            </h3>
             <div className="h-80">
               {orderStatusData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -419,7 +512,9 @@ const Dashboard = () => {
 
           {/* Recent Activity */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Recent Activity
+            </h3>
             <div className="space-y-4">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activityItem) => {
@@ -427,14 +522,24 @@ const Dashboard = () => {
                   return (
                     <div key={activityItem.id} className="flex items-start">
                       <div className="flex-shrink-0">
-                        <div className={`h-10 w-10 rounded-full ${activityItem.iconColor} flex items-center justify-center`}>
-                          <IconComponent className={`h-5 w-5 ${activityItem.iconTextColor}`} />
+                        <div
+                          className={`h-10 w-10 rounded-full ${activityItem.iconColor} flex items-center justify-center`}
+                        >
+                          <IconComponent
+                            className={`h-5 w-5 ${activityItem.iconTextColor}`}
+                          />
                         </div>
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900">{activityItem.title}</p>
-                        <p className="text-sm text-gray-500">{activityItem.description}</p>
-                        <p className="text-xs text-gray-400">{formatTimeAgo(activityItem.time)}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {activityItem.title}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {activityItem.description}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {formatTimeAgo(activityItem.time)}
+                        </p>
                       </div>
                     </div>
                   );

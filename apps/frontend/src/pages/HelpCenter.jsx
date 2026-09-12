@@ -4,48 +4,87 @@ import { Link } from "react-router-dom";
 
 /* ───────────── icons ───────────── */
 const Icon = ({ children, className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${className}`}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={`w-5 h-5 ${className}`}
+  >
     {children}
   </svg>
 );
 const TruckIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.079-.504 1.036-1.124a20.916 20.916 0 0 0-1.395-5.88 2.12 2.12 0 0 0-1.81-1.246h-3.362a2.1 2.1 0 0 1-1.27-.432l-.727-.545a2.1 2.1 0 0 0-1.27-.432H9.12a2.1 2.1 0 0 0-1.478.604L6.3 11.25H4.875c-.621 0-1.125.504-1.125 1.125v3.75" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.079-.504 1.036-1.124a20.916 20.916 0 0 0-1.395-5.88 2.12 2.12 0 0 0-1.81-1.246h-3.362a2.1 2.1 0 0 1-1.27-.432l-.727-.545a2.1 2.1 0 0 0-1.27-.432H9.12a2.1 2.1 0 0 0-1.478.604L6.3 11.25H4.875c-.621 0-1.125.504-1.125 1.125v3.75"
+    />
   </Icon>
 );
 const ArrowPathIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"
+    />
   </Icon>
 );
 const CreditCardIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
+    />
   </Icon>
 );
 const UserCircleIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+    />
   </Icon>
 );
 const ArrowRightIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+    />
   </Icon>
 );
 const QuestionIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+    />
   </Icon>
 );
 const ChatIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+    />
   </Icon>
 );
 const MagnifyingGlassIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+    />
   </Icon>
 );
 
@@ -54,7 +93,8 @@ const helpTopics = [
   {
     icon: TruckIcon,
     title: "Shipping & Delivery",
-    description: "Delivery timelines, shipping costs, and tracking details for all Egyptian cities.",
+    description:
+      "Delivery timelines, shipping costs, and tracking details for all Egyptian cities.",
     link: "/shipping",
     linkText: "View Shipping Info",
     accent: "bg-blue-50 text-blue-600 border-blue-100",
@@ -63,7 +103,8 @@ const helpTopics = [
   {
     icon: ArrowPathIcon,
     title: "Returns & Exchanges",
-    description: "Return eligibility within 14 days, process steps, and refund timing.",
+    description:
+      "Return eligibility within 14 days, process steps, and refund timing.",
     link: "/return-policy",
     linkText: "Read Return Policy",
     accent: "bg-amber-50 text-amber-600 border-amber-100",
@@ -72,7 +113,8 @@ const helpTopics = [
   {
     icon: CreditCardIcon,
     title: "Payments",
-    description: "Available payment methods, pricing, and order total breakdowns.",
+    description:
+      "Available payment methods, pricing, and order total breakdowns.",
     link: "/contact",
     linkText: "Contact Us",
     accent: "bg-green-50 text-green-600 border-green-100",
@@ -81,7 +123,8 @@ const helpTopics = [
   {
     icon: UserCircleIcon,
     title: "Account & Orders",
-    description: "Manage your profile, wishlist, order history, and saved addresses.",
+    description:
+      "Manage your profile, wishlist, order history, and saved addresses.",
     link: "/profile",
     linkText: "Go to Profile",
     accent: "bg-purple-50 text-purple-600 border-purple-100",
@@ -90,9 +133,18 @@ const helpTopics = [
 ];
 
 const quickFaqs = [
-  { q: "How long does delivery take?", a: "1–4 business days depending on your location within Egypt." },
-  { q: "Can I return a notebook?", a: "Yes — unused items can be returned within 14 days of delivery." },
-  { q: "How do I track my order?", a: "Enter your order ID on our shipping page or check your profile's order history." },
+  {
+    q: "How long does delivery take?",
+    a: "1–4 business days depending on your location within Egypt.",
+  },
+  {
+    q: "Can I return a notebook?",
+    a: "Yes — unused items can be returned within 14 days of delivery.",
+  },
+  {
+    q: "How do I track my order?",
+    a: "Enter your order ID on our shipping page or check your profile's order history.",
+  },
 ];
 
 /* ───────────── component ───────────── */
@@ -101,10 +153,10 @@ const HelpCenter = () => {
 
   const filtered = search.trim()
     ? helpTopics.filter(
-      (t) =>
-        t.title.toLowerCase().includes(search.toLowerCase()) ||
-        t.description.toLowerCase().includes(search.toLowerCase())
-    )
+        (t) =>
+          t.title.toLowerCase().includes(search.toLowerCase()) ||
+          t.description.toLowerCase().includes(search.toLowerCase())
+      )
     : helpTopics;
 
   return (
@@ -117,7 +169,9 @@ const HelpCenter = () => {
         <div className="max-w-2xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-6">
             <QuestionIcon className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Help Center</span>
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              Help Center
+            </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
             How can we help you?
@@ -143,7 +197,12 @@ const HelpCenter = () => {
                 onClick={() => setSearch("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="w-3 h-3"
+                >
                   <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
                 </svg>
               </button>
@@ -160,36 +219,45 @@ const HelpCenter = () => {
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <MagnifyingGlassIcon className="w-6 h-6 text-gray-400" />
               </div>
-              <p className="text-sm text-gray-500 mb-1">No topics match "<strong>{search}</strong>"</p>
-              <button onClick={() => setSearch("")} className="text-sm text-primary font-medium hover:underline">
+              <p className="text-sm text-gray-500 mb-1">
+                No topics match "<strong>{search}</strong>"
+              </p>
+              <button
+                onClick={() => setSearch("")}
+                className="text-sm text-primary font-medium hover:underline"
+              >
                 Clear search
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {filtered.map(({ icon: Ico, title, description, link, linkText, iconBg }) => (
-                <Link
-                  key={title}
-                  to={link}
-                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 p-6 transition-all duration-300 flex gap-5"
-                >
-                  <span className={`w-11 h-11 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0`}>
-                    <Ico className="w-5 h-5 text-primary" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-primary transition-colors">
-                      {title}
-                    </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-3">
-                      {description}
-                    </p>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-                      {linkText}
-                      <ArrowRightIcon className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              {filtered.map(
+                ({ icon: Ico, title, description, link, linkText, iconBg }) => (
+                  <Link
+                    key={title}
+                    to={link}
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 p-6 transition-all duration-300 flex gap-5"
+                  >
+                    <span
+                      className={`w-11 h-11 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0`}
+                    >
+                      <Ico className="w-5 h-5 text-primary" />
                     </span>
-                  </div>
-                </Link>
-              ))}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-primary transition-colors">
+                        {title}
+                      </h3>
+                      <p className="text-sm text-gray-500 leading-relaxed mb-3">
+                        {description}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                        {linkText}
+                        <ArrowRightIcon className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </div>
+                  </Link>
+                )
+              )}
             </div>
           )}
         </div>
@@ -210,7 +278,10 @@ const HelpCenter = () => {
 
           <div className="space-y-3">
             {quickFaqs.map(({ q, a }) => (
-              <div key={q} className="bg-white rounded-2xl border border-gray-100 p-5">
+              <div
+                key={q}
+                className="bg-white rounded-2xl border border-gray-100 p-5"
+              >
                 <h3 className="text-sm font-bold text-gray-900 mb-1.5">{q}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
               </div>
@@ -234,7 +305,8 @@ const HelpCenter = () => {
                 Still need help?
               </h2>
               <p className="text-sm text-gray-300 max-w-sm mx-auto mb-6 leading-relaxed">
-                Our support team is ready to help with any questions about your notebooks or orders.
+                Our support team is ready to help with any questions about your
+                notebooks or orders.
               </p>
               <Link
                 to="/contact"

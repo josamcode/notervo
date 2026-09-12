@@ -13,7 +13,9 @@ const NotFound = () => {
       <div className="text-center max-w-lg relative z-10">
         {/* Logo */}
         <Link to="/" className="inline-block mb-10">
-          <span className="text-sm font-extrabold text-gray-300 tracking-[3px] uppercase">Notervo</span>
+          <span className="text-sm font-extrabold text-gray-300 tracking-[3px] uppercase">
+            Notervo
+          </span>
         </Link>
 
         {/* 404 number */}
@@ -32,7 +34,8 @@ const NotFound = () => {
 
         {/* Description */}
         <p className="text-sm sm:text-base text-gray-500 leading-relaxed mb-8 max-w-sm mx-auto">
-          Sorry, the page you&#39;re looking for doesn&#39;t exist or has been moved to a different location.
+          Sorry, the page you&#39;re looking for doesn&#39;t exist or has been
+          moved to a different location.
         </p>
 
         {/* Actions */}
@@ -41,8 +44,19 @@ const NotFound = () => {
             to="/"
             className="group inline-flex items-center gap-2 px-7 py-3 bg-primary text-white font-bold text-sm rounded-xl hover:bg-black transition-all duration-200 shadow-lg shadow-primary/20"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
             </svg>
             Go Back Home
           </Link>
@@ -51,8 +65,19 @@ const NotFound = () => {
             className="inline-flex items-center gap-2 px-7 py-3 border-2 border-gray-200 text-gray-600 font-semibold text-sm rounded-xl hover:border-primary hover:text-primary transition-all duration-200"
           >
             Browse Shop
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+              />
             </svg>
           </Link>
         </div>
@@ -60,7 +85,10 @@ const NotFound = () => {
         {/* Subtle help text */}
         <p className="text-[11px] text-gray-400 mt-10">
           If you believe this is an error, please{" "}
-          <Link to="/contact" className="text-gray-500 underline underline-offset-2 hover:text-primary transition-colors">
+          <Link
+            to="/contact"
+            className="text-gray-500 underline underline-offset-2 hover:text-primary transition-colors"
+          >
             contact us
           </Link>
           .

@@ -4,49 +4,92 @@ import { Link, useNavigate } from "react-router-dom";
 
 /* ───────────── icons ───────────── */
 const Icon = ({ children, className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${className}`}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={`w-5 h-5 ${className}`}
+  >
     {children}
   </svg>
 );
 const TruckIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.079-.504 1.036-1.124a20.916 20.916 0 0 0-1.395-5.88 2.12 2.12 0 0 0-1.81-1.246h-3.362a2.1 2.1 0 0 1-1.27-.432l-.727-.545a2.1 2.1 0 0 0-1.27-.432H9.12a2.1 2.1 0 0 0-1.478.604L6.3 11.25H4.875c-.621 0-1.125.504-1.125 1.125v3.75" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.079-.504 1.036-1.124a20.916 20.916 0 0 0-1.395-5.88 2.12 2.12 0 0 0-1.81-1.246h-3.362a2.1 2.1 0 0 1-1.27-.432l-.727-.545a2.1 2.1 0 0 0-1.27-.432H9.12a2.1 2.1 0 0 0-1.478.604L6.3 11.25H4.875c-.621 0-1.125.504-1.125 1.125v3.75"
+    />
   </Icon>
 );
 const MapPinIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+    />
   </Icon>
 );
 const ClockIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+    />
   </Icon>
 );
 const ArrowRightIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+    />
   </Icon>
 );
 const CheckIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m4.5 12.75 6 6 9-13.5"
+    />
   </Icon>
 );
 const ShieldCheckIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
+    />
   </Icon>
 );
 const MagnifyingGlassIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+    />
   </Icon>
 );
 const ChevronDownIcon = (p) => (
   <Icon {...p}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+    />
   </Icon>
 );
 
@@ -62,7 +105,8 @@ const deliveryZones = [
   {
     city: "Major Cities",
     time: "2–4 Days",
-    details: "Alexandria, Mansoura, Tanta, and nearby cities via trusted partners.",
+    details:
+      "Alexandria, Mansoura, Tanta, and nearby cities via trusted partners.",
     icon: "🏢",
     highlight: false,
   },
@@ -88,10 +132,22 @@ const returnPoints = [
 ];
 
 const faqs = [
-  { q: "How long does delivery take?", a: "Most orders arrive within 1–4 business days depending on your city." },
-  { q: "Do you ship internationally?", a: "At the moment, shipping is available within Egypt only." },
-  { q: "Can I change my address after placing an order?", a: "Yes, if the order has not shipped yet. Contact support@notervo.com immediately." },
-  { q: "What if I miss delivery?", a: "The courier will call to arrange a second delivery attempt." },
+  {
+    q: "How long does delivery take?",
+    a: "Most orders arrive within 1–4 business days depending on your city.",
+  },
+  {
+    q: "Do you ship internationally?",
+    a: "At the moment, shipping is available within Egypt only.",
+  },
+  {
+    q: "Can I change my address after placing an order?",
+    a: "Yes, if the order has not shipped yet. Contact support@notervo.com immediately.",
+  },
+  {
+    q: "What if I miss delivery?",
+    a: "The courier will call to arrange a second delivery attempt.",
+  },
 ];
 
 /* ───────────── FAQ accordion item ───────────── */
@@ -102,8 +158,12 @@ const FaqItem = ({ q, a, open, toggle }) => (
       className="w-full flex items-center justify-between p-5 text-left"
     >
       <span className="text-sm font-bold text-gray-900 pr-4">{q}</span>
-      <span className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-all duration-200 ${open ? "bg-primary rotate-180" : "bg-gray-100"}`}>
-        <ChevronDownIcon className={`w-3.5 h-3.5 ${open ? "text-white" : "text-gray-500"}`} />
+      <span
+        className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-all duration-200 ${open ? "bg-primary rotate-180" : "bg-gray-100"}`}
+      >
+        <ChevronDownIcon
+          className={`w-3.5 h-3.5 ${open ? "text-white" : "text-gray-500"}`}
+        />
       </span>
     </button>
     <div
@@ -137,13 +197,16 @@ const ShippingInfo = () => {
         <div className="max-w-3xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-6">
             <TruckIcon className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Shipping</span>
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              Shipping
+            </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-4">
             Shipping & Delivery
           </h1>
           <p className="text-gray-500 text-sm sm:text-base max-w-lg mx-auto mb-8 leading-relaxed">
-            We ship Notervo notebooks with careful packaging and predictable timelines across Egypt.
+            We ship Notervo notebooks with careful packaging and predictable
+            timelines across Egypt.
           </p>
           <Link
             to="/shop"
@@ -172,8 +235,11 @@ const ShippingInfo = () => {
             {deliveryZones.map(({ city, time, details, icon, highlight }) => (
               <div
                 key={city}
-                className={`group bg-white rounded-2xl border shadow-sm hover:shadow-lg p-6 text-center transition-all duration-300 ${highlight ? "border-primary/20 ring-1 ring-primary/5" : "border-gray-100 hover:border-gray-200"
-                  }`}
+                className={`group bg-white rounded-2xl border shadow-sm hover:shadow-lg p-6 text-center transition-all duration-300 ${
+                  highlight
+                    ? "border-primary/20 ring-1 ring-primary/5"
+                    : "border-gray-100 hover:border-gray-200"
+                }`}
               >
                 {highlight && (
                   <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold uppercase tracking-wider mb-3">
@@ -181,12 +247,16 @@ const ShippingInfo = () => {
                   </span>
                 )}
                 <div className="text-3xl mb-3">{icon}</div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">{city}</h3>
+                <h3 className="text-base font-bold text-gray-900 mb-1">
+                  {city}
+                </h3>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-primary/5 mb-3">
                   <ClockIcon className="w-3.5 h-3.5 text-primary" />
                   <span className="text-sm font-bold text-primary">{time}</span>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{details}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {details}
+                </p>
               </div>
             ))}
           </div>
@@ -204,14 +274,20 @@ const ShippingInfo = () => {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
               Shipping Rates
             </h2>
-            <p className="text-gray-500 text-sm mt-2">Clear pricing for every location.</p>
+            <p className="text-gray-500 text-sm mt-2">
+              Clear pricing for every location.
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             {/* Table header */}
             <div className="grid grid-cols-2 gap-4 px-6 py-3.5 bg-gray-50/80 border-b border-gray-100">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Location</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Cost</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                Location
+              </span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">
+                Cost
+              </span>
             </div>
 
             {/* Rows */}
@@ -220,8 +296,12 @@ const ShippingInfo = () => {
                 key={location}
                 className={`grid grid-cols-2 gap-4 px-6 py-4 items-center ${i < shippingRates.length - 1 ? "border-b border-gray-50" : ""}`}
               >
-                <span className="text-sm text-gray-900 font-medium">{location}</span>
-                <span className={`text-sm font-bold text-right ${highlight ? "text-green-600" : "text-gray-900"}`}>
+                <span className="text-sm text-gray-900 font-medium">
+                  {location}
+                </span>
+                <span
+                  className={`text-sm font-bold text-right ${highlight ? "text-green-600" : "text-gray-900"}`}
+                >
                   {highlight && (
                     <span className="inline-flex items-center gap-1">
                       <CheckIcon className="w-3.5 h-3.5" />
@@ -254,7 +334,9 @@ const ShippingInfo = () => {
               Returns & Exchanges
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-6">
-              You can request a return within <strong className="text-gray-900">14 days</strong> of delivery for eligible notebook items.
+              You can request a return within{" "}
+              <strong className="text-gray-900">14 days</strong> of delivery for
+              eligible notebook items.
             </p>
 
             <div className="space-y-3 mb-8">
@@ -263,7 +345,9 @@ const ShippingInfo = () => {
                   <span className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <CheckIcon className="w-3 h-3 text-primary" />
                   </span>
-                  <span className="text-sm text-gray-600 leading-relaxed">{point}</span>
+                  <span className="text-sm text-gray-600 leading-relaxed">
+                    {point}
+                  </span>
                 </div>
               ))}
             </div>
@@ -288,7 +372,9 @@ const ShippingInfo = () => {
             </div>
             <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl border border-gray-100 shadow-xl px-5 py-4 hidden sm:block">
               <p className="text-2xl font-extrabold text-gray-900">14</p>
-              <p className="text-xs text-gray-500 font-medium">Days to return</p>
+              <p className="text-xs text-gray-500 font-medium">
+                Days to return
+              </p>
             </div>
           </div>
         </div>
@@ -306,10 +392,19 @@ const ShippingInfo = () => {
           </h2>
           <p className="text-gray-500 text-sm mb-8">
             Enter your order ID to check status, or visit{" "}
-            <Link to="/profile" className="text-primary font-medium hover:underline">My Orders</Link>.
+            <Link
+              to="/profile"
+              className="text-primary font-medium hover:underline"
+            >
+              My Orders
+            </Link>
+            .
           </p>
 
-          <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
+          <form
+            onSubmit={handleTrack}
+            className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto"
+          >
             <div className="relative flex-1">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 <MagnifyingGlassIcon className="w-4 h-4" />
@@ -372,7 +467,8 @@ const ShippingInfo = () => {
                 Ready to Order Your Next Notebook?
               </h2>
               <p className="text-sm text-gray-300 max-w-md mx-auto mb-6 leading-relaxed">
-                Fast delivery, clear return policy, and consistent notebook quality.
+                Fast delivery, clear return policy, and consistent notebook
+                quality.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
@@ -397,7 +493,10 @@ const ShippingInfo = () => {
                   { icon: ShieldCheckIcon, text: "Secure packaging" },
                   { icon: MapPinIcon, text: "Egypt-wide" },
                 ].map(({ icon: Ico, text }) => (
-                  <span key={text} className="flex items-center gap-1.5 text-[11px] text-white/40">
+                  <span
+                    key={text}
+                    className="flex items-center gap-1.5 text-[11px] text-white/40"
+                  >
                     <Ico className="w-3.5 h-3.5" />
                     {text}
                   </span>

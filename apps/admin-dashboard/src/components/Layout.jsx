@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -10,27 +10,27 @@ const Layout = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    const role = Cookies.get('role');
+    const token = Cookies.get("token");
+    const role = Cookies.get("role");
 
     const protectedRoutes = [
-      '/',
-      '/orders',
-      '/products',
-      '/categories',
-      '/users',
-      '/coupons',
-      '/messages',
-      '/message-to-user',
-      '/subscribers',
-      '/analytics',
-      '/settings'
+      "/",
+      "/orders",
+      "/products",
+      "/categories",
+      "/users",
+      "/coupons",
+      "/messages",
+      "/message-to-user",
+      "/subscribers",
+      "/analytics",
+      "/settings",
     ];
 
     const isProtectedRoute = protectedRoutes.includes(location.pathname);
 
-    if (isProtectedRoute && (!token || role !== 'admin')) {
-      navigate('/login');
+    if (isProtectedRoute && (!token || role !== "admin")) {
+      navigate("/login");
     }
   }, [location.pathname, navigate]);
 
