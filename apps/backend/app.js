@@ -19,6 +19,10 @@ const notebookCategoriesRoutes = require("./routes/notebookCategoriesRoutes");
 
 const app = express();
 app.disable("x-powered-by");
+// Behind a reverse proxy, set TRUST_PROXY to the number of proxy hops so
+// rate limiting sees the client IP instead of the proxy's.
+if (process.env.TRUST_PROXY)
+  app.set("trust proxy", Number(process.env.TRUST_PROXY));
 app.use(helmet());
 
 app.use("/api/public", express.static(path.join(__dirname, "public")));
