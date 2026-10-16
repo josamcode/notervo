@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import useNavCounts from "../hooks/useNavCounts";
 
 /* ═══════════════════════════════════════════════════════
    TAB ICONS
@@ -264,14 +263,14 @@ const getMenuSections = (isLoggedIn) => [
 /* ═══════════════════════════════════════════════════════
    BOTTOM TAB BAR
    ═══════════════════════════════════════════════════════ */
-const BottomTabBar = () => {
+const BottomTabBar = ({ counts }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
   const [menuOpen, setMenuOpen] = useState(false);
   const panelRef = useRef(null);
-  const { isLoggedIn, cartCount, wishlistCount, messagesCount } =
-    useNavCounts();
+  const moreButtonRef = useRef(null);
+  const { isLoggedIn, cartCount, wishlistCount, messagesCount } = counts;
   const menuSections = getMenuSections(isLoggedIn);
 
   /* close on route change */
@@ -283,6 +282,7 @@ const BottomTabBar = () => {
   useEffect(() => {
     if (!menuOpen) return;
     const handle = (e) => {
+      if (moreButtonRef.current?.contains(e.target)) return;
       if (panelRef.current && !panelRef.current.contains(e.target))
         setMenuOpen(false);
     };
@@ -341,7 +341,7 @@ const BottomTabBar = () => {
     <>
       {/* ── Backdrop ── */}
       <div
-        className={`fixed inset-0 z-[98] bg-black/40 backdrop-blur-[2px] md:hidden transition-opacity duration-300 ${menuOpen ? "opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-[98] bg-ink/40 backdrop-blur-[2px] md:hidden transition-opacity duration-300 ${menuOpen ? "opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"}`}
         onClick={() => setMenuOpen(false)}
       />
 
@@ -350,26 +350,27 @@ const BottomTabBar = () => {
         ref={panelRef}
         className={`fixed left-3 right-3 z-[99] md:hidden transition-all duration-300 ease-out ${
           menuOpen
-            ? "bottom-[76px] opacity-100 translate-y-0"
-            : "bottom-[68px] opacity-0 translate-y-6 pointer-events-none"
+            ? "bottom-tabbar mb-3 opacity-100 translate-y-0"
+            : "bottom-tabbar mb-1 opacity-0 translate-y-6 pointer-events-none"
         }`}
       >
-        <div className="bg-white rounded-3xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden">
+        <div className="bg-cream rounded-[28px] shadow-2xl shadow-ink/20 border border-ink/10 overflow-hidden">
           <div className="max-h-[65vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* header */}
-            <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-lg px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">
+            <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-lg px-5 py-3.5 border-b border-ink/10 flex items-center justify-between">
+              <h3 className="font-serif text-[22px] font-light leading-none text-ink">
                 Menu
               </h3>
               <button
                 onClick={() => setMenuOpen(false)}
-                className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
+                aria-label="Close menu"
+                className="w-9 h-9 rounded-full bg-ink/5 flex items-center justify-center active:bg-ink/10 transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="w-4 h-4 text-gray-500"
+                  className="w-4 h-4 text-ink"
                 >
                   <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
                 </svg>
@@ -381,9 +382,9 @@ const BottomTabBar = () => {
               {menuSections.map((section, si) => (
                 <div key={section.title}>
                   {si > 0 && (
-                    <div className="my-1.5 mx-2 border-t border-gray-100" />
+                    <div className="my-1.5 mx-2 border-t border-ink/10" />
                   )}
-                  <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <p className="px-3 pt-2.5 pb-1 text-[11px] text-muted uppercase tracking-[0.04em]">
                     {section.title}
                   </p>
                   {section.items.map(({ label, icon: Ico, href }) => {
@@ -394,25 +395,25 @@ const BottomTabBar = () => {
                         key={label}
                         to={href}
                         onClick={() => setMenuOpen(false)}
-                        className={`flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-colors active:bg-gray-50 ${active ? "bg-primary/[0.04]" : ""}`}
+                        className={`flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-colors active:bg-ink/5 ${active ? "bg-ink/[0.04]" : ""}`}
                       >
                         <span
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${active ? "bg-primary text-white" : "bg-gray-50 text-gray-500"}`}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${active ? "bg-ink text-cream" : "bg-cream-deep text-ink"}`}
                         >
                           <Ico />
                         </span>
                         <span
-                          className={`text-[13px] font-semibold flex-1 ${active ? "text-primary" : "text-gray-800"}`}
+                          className={`text-[15px] flex-1 ${active ? "text-ink font-medium" : "text-ink/85"}`}
                         >
                           {label}
                         </span>
                         {isMessagesItem && messagesCount > 0 && !active && (
-                          <span className="min-w-[20px] h-5 rounded-full bg-primary px-1.5 text-[10px] font-bold text-white flex items-center justify-center">
+                          <span className="min-w-[20px] h-5 rounded-full bg-ink px-1.5 text-[10px] font-semibold text-cream flex items-center justify-center">
                             {messagesCount > 99 ? "99+" : messagesCount}
                           </span>
                         )}
                         {active && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink flex-shrink-0" />
                         )}
                         {!active && !(isMessagesItem && messagesCount > 0) && (
                           <svg
@@ -421,7 +422,7 @@ const BottomTabBar = () => {
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                             stroke="currentColor"
-                            className="w-3.5 h-3.5 text-gray-300"
+                            className="w-3.5 h-3.5 text-ink/30"
                           >
                             <path
                               strokeLinecap="round"
@@ -439,17 +440,15 @@ const BottomTabBar = () => {
               {/* Logout */}
               {isLoggedIn && (
                 <>
-                  <div className="my-1.5 mx-2 border-t border-gray-100" />
+                  <div className="my-1.5 mx-2 border-t border-ink/10" />
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-2xl active:bg-red-50 transition-colors"
+                    className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-2xl active:bg-ember/10 transition-colors"
                   >
-                    <span className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-                      <LogoutIco className="text-red-500" />
+                    <span className="w-9 h-9 rounded-full bg-ember/10 flex items-center justify-center flex-shrink-0">
+                      <LogoutIco className="text-ember" />
                     </span>
-                    <span className="text-[13px] font-semibold text-red-500">
-                      Log Out
-                    </span>
+                    <span className="text-[15px] text-ember">Log Out</span>
                   </button>
                 </>
               )}
@@ -457,8 +456,8 @@ const BottomTabBar = () => {
           </div>
 
           {/* brand footer */}
-          <div className="border-t border-gray-100 px-5 py-2.5 text-center">
-            <span className="text-[10px] font-bold text-gray-300 tracking-[3px] uppercase">
+          <div className="border-t border-ink/10 px-5 py-3 text-center">
+            <span className="font-serif text-[15px] italic text-ink/40">
               Notervo
             </span>
           </div>
@@ -467,7 +466,8 @@ const BottomTabBar = () => {
 
       {/* ── Tab Bar ── */}
       <nav
-        className="mobile-tab-bar fixed bottom-0 inset-x-0 z-[100] bg-white/95 backdrop-blur-lg border-t border-gray-100 md:hidden"
+        aria-label="App navigation"
+        className="mobile-tab-bar fixed bottom-0 inset-x-0 z-[100] bg-cream/95 backdrop-blur-lg border-t border-ink/10 md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
@@ -481,14 +481,17 @@ const BottomTabBar = () => {
               return (
                 <button
                   key="more"
+                  ref={moreButtonRef}
                   onClick={() => setMenuOpen((o) => !o)}
-                  className={`flex flex-col items-center justify-center gap-0.5 w-14 h-full transition-colors ${active ? "text-primary" : "text-gray-400"}`}
+                  aria-expanded={menuOpen}
+                  aria-label="More"
+                  className={`flex flex-col items-center justify-center gap-1 w-16 h-full transition-colors active:scale-95 ${active ? "text-ink" : "text-ink/45"}`}
                 >
                   <div className="relative">
                     <Ico active={active} />
                   </div>
                   <span
-                    className={`text-[10px] font-semibold ${active ? "text-primary" : "text-gray-400"}`}
+                    className={`text-[11px] tracking-[0.01em] ${active ? "text-ink font-medium" : "text-ink/55"}`}
                   >
                     {label}
                   </span>
@@ -501,18 +504,19 @@ const BottomTabBar = () => {
                 key={label}
                 to={href}
                 onClick={() => menuOpen && setMenuOpen(false)}
-                className={`flex flex-col items-center justify-center gap-0.5 w-14 h-full transition-colors ${active ? "text-primary" : "text-gray-400"}`}
+                aria-current={active ? "page" : undefined}
+                className={`flex flex-col items-center justify-center gap-1 w-16 h-full transition-[color,transform] active:scale-95 ${active ? "text-ink" : "text-ink/45"}`}
               >
                 <div className="relative">
                   <Ico active={active} />
                   {count > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] rounded-full bg-primary px-1 text-[9px] font-bold text-white flex items-center justify-center">
+                    <span className="absolute -top-1.5 -right-2.5 min-w-[17px] h-[17px] rounded-full bg-ink px-1 text-[10px] font-semibold text-cream flex items-center justify-center ring-2 ring-cream">
                       {count > 99 ? "99+" : count}
                     </span>
                   )}
                 </div>
                 <span
-                  className={`text-[10px] font-semibold ${active ? "text-primary" : "text-gray-400"}`}
+                  className={`text-[11px] tracking-[0.01em] ${active ? "text-ink font-medium" : "text-ink/55"}`}
                 >
                   {label}
                 </span>

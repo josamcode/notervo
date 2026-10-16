@@ -1,15 +1,22 @@
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-const Home = lazy(() => import("./pages/Home"));
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
-const NotFound = lazy(() => import("./pages/NotFound"));
 import Footer from "./components/Footer";
+import StickyTopBar from "./components/StickyTopBar";
+import BottomTabBar from "./components/BottomTabBar";
+import SearchOverlay from "./components/SearchOverlay";
+import ScrollToTop from "./utils/ScrollToTop";
+import useNavCounts from "./hooks/useNavCounts";
+import { useIsDesktop } from "./hooks/useMediaQuery";
+import { Spinner } from "./components/ui/Icons";
+
+const Home = lazy(() => import("./pages/Home"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const Register = lazy(() => import("./pages/Register"));
 const Login = lazy(() => import("./pages/Login"));
 const ProductPage = lazy(() => import("./pages/Product"));
 const Shop = lazy(() => import("./pages/Shop"));
-import ScrollToTop from "./utils/ScrollToTop";
-import { Toaster } from "react-hot-toast";
 const Cart = lazy(() => import("./pages/Cart"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Checkout = lazy(() => import("./pages/Checkout"));
@@ -23,28 +30,55 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const ContactPage = lazy(() => import("./pages/Contact"));
 const MyMessages = lazy(() => import("./pages/MyMessages"));
-import StickyTopBar from "./components/StickyTopBar";
-import BottomTabBar from "./components/BottomTabBar";
 
-function App() {
+const PageFallback = () => (
+  <div
+    role="status"
+    className="flex min-h-[60vh] items-center justify-center text-muted"
+  >
+    <Spinner className="h-5 w-5" />
+    <span className="sr-only">Loading…</span>
+  </div>
+);
+
+function Shell() {
+  const counts = useNavCounts();
+  const isDesktop = useIsDesktop();
+  const { pathname } = useLocation();
+  // The desktop home hero sits under the transparent header.
+  const underHeader = pathname === "/" || pathname === "/home";
+
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
-      <div className="hidden md:block">
-        <Header />
-      </div>
-      <div className="md:hidden">
-        <StickyTopBar />
-      </div>
-      <Toaster />
-      <main className="pb-20 md:pb-0">
-        <Suspense
-          fallback={
-            <p role="status" className="p-8 text-center">
-              Loading…
-            </p>
-          }
-        >
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[300] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-cream"
+      >
+        Skip to content
+      </a>
+      {isDesktop ? (
+        <Header counts={counts} />
+      ) : (
+        <StickyTopBar counts={counts} />
+      )}
+      <Toaster
+        toastOptions={{
+          style: {
+            background: "#262624",
+            color: "#FFFBF2",
+            borderRadius: "999px",
+          },
+          success: { iconTheme: { primary: "#FFFBF2", secondary: "#262624" } },
+          error: { iconTheme: { primary: "#E2552D", secondary: "#FFFBF2" } },
+        }}
+      />
+      <SearchOverlay />
+      <main
+        id="main"
+        className={`pb-tabbar md:pb-0 ${underHeader ? "" : "md:pt-[var(--header-h)]"}`}
+      >
+        <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
@@ -73,10 +107,15 @@ function App() {
           </Routes>
         </Suspense>
       </main>
-      <div className="hidden md:block">
-        <Footer />
-      </div>
-      <BottomTabBar />
+      {isDesktop ? <Footer /> : <BottomTabBar counts={counts} />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Shell />
     </BrowserRouter>
   );
 }
