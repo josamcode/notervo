@@ -216,11 +216,8 @@ const getEmailVerificationSuccessHTML = (username) =>
       Redirecting to login in 5 seconds&hellip;
     </p>
 
-    <script>
-      setTimeout(function() {
-        window.location.href = '${SECOND_BASE_URL}/login';
-      }, 5000);
-    </script>
+    <!-- Helmet's CSP blocks inline scripts, so redirect without one. -->
+    <meta http-equiv="refresh" content="5;url=${SECOND_BASE_URL}/login">
   `
   );
 
