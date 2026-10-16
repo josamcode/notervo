@@ -1,6 +1,5 @@
-// src/components/ProductCard.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   addToCart,
   checkProductInCart,
@@ -12,154 +11,128 @@ import {
   removeFromWishlist,
 } from "../utils/WishlistUtils";
 import { showError, showSuccess } from "../utils/Toast";
-import { resolveProductImageUrl } from "../utils/imageUrl";
-import Currency from "./Currency";
+import { getDiscountedPrice } from "../utils/pricing";
+import SmartImage from "./ui/SmartImage";
+import { Price } from "./ui/Primitives";
+import { Check, Heart, HeartSolid, Plus, Spinner, Star } from "./ui/Icons";
 
-/* ───────────── micro icons ───────────── */
-const HeartOutline = ({ className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-    />
-  </svg>
-);
-const HeartSolid = ({ className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    className={className}
-  >
-    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-  </svg>
-);
-const StarSolid = ({ className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    className={className}
-  >
-    <path
-      fillRule="evenodd"
-      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-const CartPlus = ({ className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 4.5v15m7.5-7.5h-15"
-    />
-  </svg>
-);
-const CartCheck = ({ className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m4.5 12.75 6 6 9-13.5"
-    />
-  </svg>
-);
+const titleCase = (value = "") =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
-export default function ProductCard({ product }) {
-  const navigate = useNavigate();
+/** Variant line under the name (Karst shows the colourway/format). */
+const subtitleFor = (product) => {
+  if (product.sizes?.length) return product.sizes.join(" · ");
+  if (product.category?.length)
+    return product.category.map(titleCase).join(" · ");
+  return product.brand || "";
+};
+
+/**
+ * Grid wrapper: hairline-bordered editorial grid on desktop, gapped two-column
+ * app grid on phones. `columns` controls the desktop column count.
+ */
+export function ProductGrid({ children, columns = 4, className = "" }) {
+  const desktopCols =
+    columns === 3 ? "md:grid-cols-3" : "md:grid-cols-3 lg:grid-cols-4";
+  return (
+    <ul
+      className={`grid grid-cols-2 gap-x-3 gap-y-5 px-4 sm:grid-cols-3 md:gap-0 md:border-t md:border-ink-line md:px-0 ${desktopCols} ${className}`}
+    >
+      {React.Children.map(children, (child) =>
+        child ? (
+          <li className="min-w-0 md:border-b md:border-r md:border-ink-line md:[&:nth-child(3n)]:border-r-0 lg:[&:nth-child(3n)]:border-r lg:[&:nth-child(4n)]:border-r-0">
+            {child}
+          </li>
+        ) : null
+      )}
+    </ul>
+  );
+}
+
+/** Loading placeholder matching the card footprint. */
+export function ProductCardSkeleton() {
+  return (
+    <div aria-hidden="true" className="md:p-0">
+      <div className="skeleton aspect-[4/5] rounded-2xl md:aspect-[11/10] md:rounded-none" />
+      <div className="space-y-2 px-1 pt-3 md:px-4 md:pb-5">
+        <div className="skeleton h-3.5 w-3/4" />
+        <div className="skeleton h-3 w-1/3" />
+        <div className="skeleton h-3.5 w-1/4" />
+      </div>
+    </div>
+  );
+}
+
+export default function ProductCard({ product, priority = false }) {
   const [inCart, setInCart] = useState(false);
   const [checkingCart, setCheckingCart] = useState(true);
   const [inWishlist, setInWishlist] = useState(false);
   const [checkingWishlist, setCheckingWishlist] = useState(true);
-  const [cartAnimating, setCartAnimating] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const defaultColor = product.colors?.[0] || null;
   const defaultSize = product.sizes?.[0] || null;
-
-  const finalPrice =
-    product.discount > 0
-      ? product.discountType === "fixed"
-        ? product.price - product.discount
-        : product.price * (1 - product.discount / 100)
-      : product.price;
-
+  const { originalPrice, finalPrice, discountAmount } =
+    getDiscountedPrice(product);
   const discountPercent =
-    product.discount > 0
-      ? product.discountType === "fixed"
-        ? Math.round((product.discount / product.price) * 100)
-        : product.discount
+    discountAmount > 0 && originalPrice > 0
+      ? Math.round((discountAmount / originalPrice) * 100)
       : 0;
-
-  const imageUrl = resolveProductImageUrl(product.images?.[0]);
   const isAvailable = product.inStock && product.stockQuantity > 0;
+  const [primaryImage, hoverImage] = product.images || [];
+  const href = `/products/${product._id}`;
 
   useEffect(() => {
+    let active = true;
     const check = async () => {
       setCheckingCart(true);
       setCheckingWishlist(true);
-      const cartExists = await checkProductInCart(
-        product._id,
-        defaultColor,
-        defaultSize
-      );
-      const wishlistExists = await checkProductInWishlist(product._id);
+      const [cartExists, wishlistExists] = await Promise.all([
+        checkProductInCart(product._id, defaultColor, defaultSize),
+        checkProductInWishlist(product._id),
+      ]);
+      if (!active) return;
       setInCart(cartExists);
       setInWishlist(wishlistExists);
       setCheckingCart(false);
       setCheckingWishlist(false);
     };
     check();
+    return () => {
+      active = false;
+    };
   }, [product._id, defaultColor, defaultSize]);
 
   const handleCartToggle = async (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    setCartAnimating(true);
-    setTimeout(() => setCartAnimating(false), 400);
-
-    if (inCart) {
-      const result = await removeFromCart(
-        product._id,
-        defaultColor,
-        defaultSize
-      );
-      if (result.success) {
-        setInCart(false);
-        showSuccess(`${product.title} removed from cart.`);
-      } else showError(result.message);
-    } else {
-      const result = await addToCart(product._id, 1, null, null);
-      if (result.success) {
-        setInCart(true);
-        showSuccess(`${product.title} added to cart.`);
-      } else showError(result.message);
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (inCart) {
+        const result = await removeFromCart(
+          product._id,
+          defaultColor,
+          defaultSize
+        );
+        if (result.success) {
+          setInCart(false);
+          showSuccess(`${product.title} removed from cart.`);
+        } else showError(result.message);
+      } else {
+        const result = await addToCart(product._id, 1, null, null);
+        if (result.success) {
+          setInCart(true);
+          showSuccess(`${product.title} added to cart.`);
+        } else showError(result.message);
+      }
+    } finally {
+      setBusy(false);
     }
   };
 
   const handleWishlistToggle = async (e) => {
+    e.preventDefault();
     e.stopPropagation();
     if (inWishlist) {
       const result = await removeFromWishlist(product._id);
@@ -176,152 +149,150 @@ export default function ProductCard({ product }) {
     }
   };
 
+  const cartLabel = inCart
+    ? `Remove ${product.title} from cart`
+    : `Add ${product.title} to cart`;
+
   return (
-    <div
-      onClick={() => navigate(`/products/${product._id}`)}
-      className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
-    >
-      {/* ───── Image section ───── */}
-      <div className="relative overflow-hidden bg-gray-50">
-        {/* Aspect ratio container */}
-        <div className="aspect-[4/5] max-h-[250px] w-full">
-          <img
-            src={imageUrl}
-            alt={product.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-            onError={(e) => {
-              e.target.src = "/images/fallback-product.png";
-            }}
+    <article className="group relative flex h-full flex-col">
+      {/* Image */}
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-cream-dim md:aspect-[11/10] md:rounded-none md:bg-transparent">
+        <SmartImage
+          src={primaryImage}
+          alt={product.title}
+          width={900}
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          loading={priority ? "eager" : "lazy"}
+          className={`absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-[150ms,400ms] ease-in-out md:group-hover:scale-[1.02] ${
+            hoverImage ? "md:group-hover:opacity-0" : ""
+          }`}
+        />
+        {hoverImage && (
+          <SmartImage
+            src={hoverImage}
+            alt=""
+            width={900}
+            sizes="(min-width: 1024px) 25vw, 33vw"
+            aria-hidden="true"
+            className="absolute inset-0 hidden h-full w-full scale-[1.02] object-cover opacity-0 transition-[opacity,transform] duration-[150ms,400ms] ease-in-out md:block md:group-hover:scale-100 md:group-hover:opacity-100"
           />
-        </div>
+        )}
 
-        {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        {/* Discount badge */}
-        {product.discount > 0 && (
-          <span className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-rose-600 text-white text-[11px] font-bold rounded-lg shadow-lg">
-            -{discountPercent}%
+        {discountPercent > 0 && isAvailable && (
+          <span className="badge absolute left-2.5 top-2.5 z-10 bg-ink text-cream md:left-4 md:top-4">
+            −{discountPercent}%
+          </span>
+        )}
+        {!isAvailable && (
+          <span className="badge absolute left-2.5 top-2.5 z-10 bg-cream/90 text-ink md:hidden">
+            Sold out
           </span>
         )}
 
-        {/* Wishlist button */}
         <button
+          type="button"
           onClick={handleWishlistToggle}
           disabled={checkingWishlist}
-          className={`
-                        absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center
-                        transition-all duration-200 shadow-md backdrop-blur-sm
-                        ${
-                          inWishlist
-                            ? "bg-red-50 text-red-500 hover:bg-red-100"
-                            : "bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white"
-                        }
-                    `}
-          title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          aria-pressed={inWishlist}
+          aria-label={
+            inWishlist
+              ? `Remove ${product.title} from wishlist`
+              : `Save ${product.title} to wishlist`
+          }
+          className={`icon-btn absolute right-2.5 top-2.5 z-20 h-9 w-9 rounded-full bg-cream/90 text-ink shadow-sm backdrop-blur-sm transition-[opacity,transform] duration-200 active:scale-90 md:right-3 md:top-3 md:shadow-none md:focus-visible:opacity-100 ${
+            inWishlist ? "" : "md:opacity-0 md:group-hover:opacity-100"
+          }`}
         >
           {inWishlist ? (
-            <HeartSolid className="w-4 h-4" />
+            <HeartSolid className="h-[18px] w-[18px] text-ember" />
           ) : (
-            <HeartOutline className="w-4 h-4" />
+            <Heart className="h-[18px] w-[18px]" />
           )}
         </button>
-
-        {/* Out of stock overlay */}
-        {!isAvailable && (
-          <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] z-20 flex items-center justify-center">
-            <span className="px-3 py-1.5 bg-gray-900 text-white text-xs font-bold rounded-lg">
-              Out of Stock
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* ───── Info section ───── */}
-      <div className="p-4 flex flex-col flex-grow">
-        {/* Brand */}
-        {product.brand && (
-          <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-0.5">
-            {product.brand}
+      {/* Info */}
+      <div className="flex flex-1 flex-col px-1 pt-3 md:px-4 md:pb-5 md:pt-4">
+        {!isAvailable && (
+          <p className="mb-1 hidden text-[12px] uppercase text-muted md:block">
+            Sold out
+          </p>
+        )}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="min-w-0 font-sans text-[14px] leading-snug tracking-normal text-ink md:uppercase md:leading-[1.25]">
+            <Link
+              to={href}
+              className="line-clamp-2 after:absolute after:inset-0 after:z-10 after:content-[''] focus-visible:outline-none"
+            >
+              {product.title}
+            </Link>
+          </h3>
+          {isAvailable && (
+            <button
+              type="button"
+              onClick={handleCartToggle}
+              disabled={checkingCart || busy}
+              aria-label={cartLabel}
+              aria-pressed={inCart}
+              className={`icon-btn relative z-20 hidden h-[22px] w-[22px] shrink-0 border border-ink transition-colors duration-200 md:inline-flex ${
+                inCart
+                  ? "bg-ink text-cream"
+                  : "text-ink hover:bg-ink hover:text-cream"
+              }`}
+            >
+              {checkingCart || busy ? (
+                <Spinner className="h-3 w-3" />
+              ) : inCart ? (
+                <Check className="h-3.5 w-3.5" strokeWidth={2} />
+              ) : (
+                <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+              )}
+            </button>
+          )}
+        </div>
+        <p className="mt-0.5 hidden truncate text-[14px] text-ink/80 md:block">
+          {subtitleFor(product)}
+        </p>
+
+        {product.rating > 0 && (
+          <p className="mt-1 flex items-center gap-1 text-[12px] text-muted md:hidden">
+            <Star className="h-3.5 w-3.5 text-ink" />
+            <span className="text-ink">
+              {Number(product.rating).toFixed(1)}
+            </span>
+            {product.numReviews > 0 && <span>({product.numReviews})</span>}
           </p>
         )}
 
-        {/* Title */}
-        <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 mb-1.5 group-hover:text-primary transition-colors duration-200">
-          {product.title}
-        </h3>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2.5">
-          <StarSolid className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs font-bold text-gray-700">
-            {product.rating.toFixed(1)}
-          </span>
-          {product.numReviews > 0 && (
-            <span className="text-[11px] text-gray-400">
-              ({product.numReviews})
-            </span>
-          )}
-        </div>
-
-        {/* Price row + cart button */}
-        <div className="mt-auto flex items-end justify-between gap-2">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm sm:text-lg font-extrabold text-gray-900">
-              {finalPrice.toFixed(2)}
-            </span>
-            <span>
-              <Currency className="text-[9px] sm:text-[11px] text-gray-400 font-medium" />
-            </span>
-            {product.discount > 0 && (
-              <span className="text-xs text-gray-400 line-through">
-                {product.price.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          {/* Cart button */}
+        <div className="mt-auto flex items-end justify-between gap-2 pt-2 md:pt-3">
+          <Price
+            value={finalPrice}
+            compareAt={originalPrice}
+            className="text-[14px] font-medium text-ink md:font-normal"
+            compareClassName="text-[12px] md:text-[14px] font-normal"
+          />
           {isAvailable && (
             <button
+              type="button"
               onClick={handleCartToggle}
-              disabled={checkingCart}
-              className={`
-                                flex-shrink-0 w-9 h-9 rounded-xl hidden items-center sm:flex justify-center transition-all duration-200
-                                ${cartAnimating ? "scale-125" : "scale-100"}
-                                ${
-                                  inCart
-                                    ? "bg-primary text-white shadow-md shadow-primary/20"
-                                    : "bg-gray-100 text-gray-600 hover:bg-primary hover:text-white hover:shadow-md hover:shadow-primary/20"
-                                }
-                            `}
-              title={inCart ? "Remove from Cart" : "Add to Cart"}
+              disabled={checkingCart || busy}
+              aria-label={cartLabel}
+              aria-pressed={inCart}
+              className={`icon-btn relative z-20 h-9 w-9 shrink-0 rounded-full transition-[background-color,transform] duration-200 active:scale-90 md:hidden ${
+                inCart ? "bg-ink text-cream" : "bg-ink/[0.06] text-ink"
+              }`}
             >
-              {checkingCart ? (
-                <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
+              {checkingCart || busy ? (
+                <Spinner className="h-3.5 w-3.5" />
               ) : inCart ? (
-                <CartCheck className="w-4 h-4" />
+                <Check className="h-4 w-4" strokeWidth={2} />
               ) : (
-                <CartPlus className="w-4 h-4" />
+                <Plus className="h-4 w-4" strokeWidth={2} />
               )}
             </button>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

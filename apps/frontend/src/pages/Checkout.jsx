@@ -1,191 +1,120 @@
-// src/pages/CheckoutPage.js
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { showSuccess, showError } from "../utils/Toast";
-import { resolveProductImageUrl } from "../utils/imageUrl";
 import { getDiscountedPrice } from "../utils/pricing";
 import { clearGuestCart, getGuestCartItems } from "../utils/guestCart";
-import Currency from "../components/Currency";
-
-/* ───────────────────────── tiny icon helpers ───────────────────────── */
-const Icon = ({ children, className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={`w-5 h-5 ${className}`}
-  >
-    {children}
-  </svg>
-);
-
-const TruckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0V5.625A1.125 1.125 0 0 0 8.625 4.5H3.375A1.125 1.125 0 0 0 2.25 5.625v8.25"
-    />
-  </Icon>
-);
-const CreditCardIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
-    />
-  </Icon>
-);
-const TagIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 6h.008v.008H6V6Z"
-    />
-  </Icon>
-);
-const CheckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m4.5 12.75 6 6 9-13.5"
-    />
-  </Icon>
-);
-const ShieldIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
-    />
-  </Icon>
-);
-const MapPinIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-    />
-  </Icon>
-);
+import SmartImage from "../components/ui/SmartImage";
+import {
+  EmptyState,
+  SummaryRow,
+  formatMoney,
+} from "../components/ui/Primitives";
+import {
+  ArrowLeft,
+  Bag,
+  Cash,
+  Check,
+  ChevronDown,
+  Spinner,
+  Tag,
+} from "../components/ui/Icons";
 
 /* ───────────────────────── step indicator ───────────────────────── */
 const STEPS = ["Cart", "Shipping", "Payment", "Confirm"];
 const StepIndicator = ({ current = 1 }) => (
-  <div className="flex items-center justify-center gap-0 mb-10 select-none">
+  <ol
+    className="flex items-center gap-2 text-[12px] uppercase tracking-[0.02em] md:gap-3 md:text-[13px]"
+    aria-label="Checkout progress"
+  >
     {STEPS.map((label, i) => {
       const done = i < current;
       const active = i === current;
       return (
         <React.Fragment key={label}>
           {i > 0 && (
-            <div
-              className={`h-[2px] w-8 sm:w-14 transition-colors duration-300 ${
-                done ? "bg-primary" : "bg-gray-200"
-              }`}
-            />
+            <li aria-hidden="true" className="h-px w-4 bg-ink/25 md:w-8" />
           )}
-          <div className="flex flex-col items-center gap-1.5">
+          <li
+            aria-current={active ? "step" : undefined}
+            className={`flex items-center gap-1.5 ${active ? "text-ink" : done ? "text-ink/70" : "text-ink/40"}`}
+          >
             <span
-              className={`
-                                flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-300
-                                ${
-                                  done
-                                    ? "bg-primary text-white"
-                                    : active
-                                      ? "bg-primary/10 text-primary ring-2 ring-primary"
-                                      : "bg-gray-100 text-gray-400"
-                                }
-                            `}
-            >
-              {done ? <CheckIcon className="w-4 h-4" /> : i + 1}
-            </span>
-            <span
-              className={`text-[11px] font-medium tracking-wide ${
-                active
-                  ? "text-primary"
-                  : done
-                    ? "text-gray-600"
-                    : "text-gray-400"
+              className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${
+                done
+                  ? "border-ink bg-ink text-cream"
+                  : active
+                    ? "border-ink"
+                    : "border-ink/30"
               }`}
             >
-              {label}
+              {done ? <Check className="h-3 w-3" strokeWidth={2.2} /> : i + 1}
             </span>
-          </div>
+            <span className={active ? "" : "hidden sm:inline"}>{label}</span>
+          </li>
         </React.Fragment>
       );
     })}
-  </div>
+  </ol>
 );
 
-/* ───────────────────────── floating label input ───────────────────────── */
-const FloatingInput = ({ label, required, as = "input", rows, ...rest }) => {
-  const Tag = as;
-  const [focused, setFocused] = useState(false);
-  const hasValue = rest.value && rest.value.length > 0;
-  const floated = focused || hasValue;
-
+/* ───────────────────────── labelled field ───────────────────────── */
+const Field = ({ label, required, as = "input", rows, name, ...rest }) => {
+  const Element = as;
+  const id = `checkout-${name}`;
   return (
-    <div className="relative group">
-      <Tag
-        {...rest}
-        rows={as === "textarea" ? rows : undefined}
-        onFocus={(e) => {
-          setFocused(true);
-          rest.onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setFocused(false);
-          rest.onBlur?.(e);
-        }}
-        required={required}
-        className={`
-                    peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-gray-900 text-[15px]
-                    transition-all duration-200 outline-none
-                    ${
-                      focused
-                        ? "border-primary ring-2 ring-primary/20"
-                        : "border-gray-200 hover:border-gray-300"
-                    }
-                    ${as === "textarea" ? "resize-none" : ""}
-                `}
-        placeholder=" "
-      />
-      <label
-        className={`
-                    absolute left-4 transition-all duration-200 pointer-events-none
-                    ${
-                      floated
-                        ? "top-1.5 text-[11px] font-medium text-primary"
-                        : "top-3.5 text-sm text-gray-400"
-                    }
-                `}
-      >
+    <div>
+      <label htmlFor={id} className="field-label">
         {label}
-        {required && " *"}
+        {required && <span aria-hidden="true"> *</span>}
       </label>
+      <Element
+        id={id}
+        name={name}
+        rows={as === "textarea" ? rows : undefined}
+        required={required}
+        className={`field ${as === "textarea" ? "resize-none" : ""}`}
+        {...rest}
+      />
     </div>
   );
 };
+
+const Section = ({ number, title, children }) => (
+  <section className="rounded-2xl border border-ink/10 bg-white/50 p-5 md:rounded-none md:border-0 md:border-b md:border-ink-line md:bg-transparent md:px-[var(--gutter)] md:py-10">
+    <h2 className="mb-5 flex items-baseline gap-3 font-serif text-[24px] font-light leading-none md:mb-7 md:text-[32px]">
+      <span className="font-sans text-[12px] tabular-nums text-muted md:text-[13px]">
+        {number}
+      </span>
+      {title}
+    </h2>
+    {children}
+  </section>
+);
+
+const Checkbox = ({ checked, disabled, onChange, children }) => (
+  <label
+    className={`flex min-h-[44px] cursor-pointer items-center gap-3 ${disabled ? "pointer-events-none opacity-40" : ""}`}
+  >
+    <input
+      type="checkbox"
+      checked={checked}
+      disabled={disabled}
+      onChange={onChange}
+      className="peer sr-only"
+    />
+    <span
+      aria-hidden="true"
+      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-ink peer-focus-visible:ring-offset-2 ${
+        checked ? "border-ink bg-ink text-cream" : "border-ink/40"
+      }`}
+    >
+      {checked && <Check className="h-3.5 w-3.5" strokeWidth={2.2} />}
+    </span>
+    <span className="text-[14px]">{children}</span>
+  </label>
+);
 
 /* ───────────────────────── main component ───────────────────────── */
 const CheckoutPage = () => {
@@ -497,30 +426,21 @@ const CheckoutPage = () => {
   /* ───────────── Loading skeleton ───────────── */
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 pt-28">
-        <div className="flex items-center justify-center gap-0 mb-10">
-          {[0, 1, 2, 3].map((i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <div className="h-[2px] w-8 sm:w-14 bg-gray-200" />}
-              <div className="flex flex-col items-center gap-1.5">
-                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-                <div className="w-10 h-3 bg-gray-200 rounded animate-pulse" />
-              </div>
-            </React.Fragment>
-          ))}
+      <div aria-busy="true">
+        <div className="container-x pb-6 pt-4 md:border-b md:border-ink-line md:pb-8 md:pt-12">
+          <div className="skeleton h-9 w-40 md:h-14 md:w-72" />
+          <div className="skeleton mt-5 h-5 w-64" />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3 space-y-4">
+        <div className="grid gap-4 px-4 md:grid-cols-[1fr_minmax(380px,34%)] md:gap-0 md:px-0">
+          <div className="space-y-4 md:space-y-0 md:px-[var(--gutter)] md:py-10">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="h-14 bg-gray-100 rounded-xl animate-pulse"
+                className="skeleton h-12 rounded-xl md:mb-4 md:rounded-none"
               />
             ))}
           </div>
-          <div className="lg:col-span-2">
-            <div className="h-72 bg-gray-100 rounded-xl animate-pulse" />
-          </div>
+          <div className="skeleton h-72 rounded-2xl md:rounded-none" />
         </div>
       </div>
     );
@@ -529,59 +449,59 @@ const CheckoutPage = () => {
   /* ───────────── Empty cart ───────────── */
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="max-w-lg mx-auto px-6 py-28 text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
-          <TruckIcon className="w-8 h-8 text-gray-400" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Your Cart is Empty
-        </h2>
-        <p className="text-gray-500 mb-8">
-          Looks like you haven't added anything yet.
-        </p>
-        <button
-          onClick={() => navigate("/shop")}
-          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-black transition-colors duration-200"
-        >
-          Browse Shop
-        </button>
-      </div>
+      <EmptyState
+        icon={Bag}
+        title="Your cart is empty"
+        description="Looks like you haven't added anything yet."
+        actionLabel="Browse the shop"
+        onAction={() => navigate("/shop")}
+      />
     );
   }
 
   const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
 
+  const placeOrderLabel = submitting ? (
+    <>
+      <Spinner className="h-4 w-4" />
+      <span>Processing…</span>
+    </>
+  ) : (
+    <span>Place order — {formatMoney(orderTotal)}</span>
+  );
+
   /* ───────────── Main checkout ───────────── */
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      {/* Header */}
-      <div className="text-center mb-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-          Checkout
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">
-          {itemCount} {itemCount === 1 ? "item" : "items"} in your order
-        </p>
-      </div>
-
-      <StepIndicator current={1} />
+    <main>
+      <header className="container-x pb-5 pt-4 md:flex md:items-end md:justify-between md:border-b md:border-ink-line md:pb-8 md:pt-12">
+        <div>
+          <Link
+            to="/cart"
+            className="mb-3 inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-ink md:mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to cart
+          </Link>
+          <h1 className="font-serif text-[30px] font-light leading-none tracking-tight md:text-display-lg">
+            Checkout
+          </h1>
+          <p className="mt-2 text-[14px] text-muted md:mt-4 md:text-[17px]">
+            {itemCount} {itemCount === 1 ? "item" : "items"} in your order
+          </p>
+        </div>
+        <div className="mt-5 md:mt-0">
+          <StepIndicator current={1} />
+        </div>
+      </header>
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start"
+        className="grid items-start gap-4 px-4 md:grid-cols-[1fr_minmax(380px,34%)] md:gap-0 md:px-0"
       >
         {/* ───── LEFT: Shipping + Payment ───── */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Saved addresses */}
+        <div className="space-y-4 md:space-y-0">
           {savedShippingAddresses.length > 0 && (
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-                <MapPinIcon className="w-[18px] h-[18px] text-primary" />
-                <h2 className="text-base font-semibold text-gray-900">
-                  Saved Addresses
-                </h2>
-              </div>
-              <div className="px-6 py-4 flex flex-wrap gap-2">
+            <Section number="01" title="Saved addresses">
+              <div className="grid gap-2.5 sm:grid-cols-2">
                 {savedShippingAddresses.map((address, index) => {
                   const selected = selectedSavedAddressIndex === index;
                   return (
@@ -589,21 +509,21 @@ const CheckoutPage = () => {
                       key={address._id || index}
                       type="button"
                       onClick={() => handleSelectSavedAddress(address, index)}
-                      className={`
-                                                relative px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200
-                                                ${
-                                                  selected
-                                                    ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                                                    : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary hover:bg-primary/5"
-                                                }
-                                            `}
+                      aria-pressed={selected}
+                      className={`relative rounded-xl border p-4 text-left transition-colors md:rounded-none ${
+                        selected
+                          ? "border-ink bg-ink text-cream"
+                          : "border-ink/20 hover:border-ink"
+                      }`}
                     >
-                      <span className="flex items-center gap-1.5">
-                        {selected && <CheckIcon className="w-3.5 h-3.5" />}
+                      <span className="flex items-center gap-2 text-[15px]">
+                        {selected && (
+                          <Check className="h-4 w-4" strokeWidth={2} />
+                        )}
                         {address.fullName || `Address ${index + 1}`}
                         {address.isDefault && (
                           <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-full ${selected ? "bg-white/20" : "bg-primary/10 text-primary"}`}
+                            className={`badge ml-auto ${selected ? "bg-cream/15 text-cream" : "bg-ink/5 text-ink"}`}
                           >
                             Default
                           </span>
@@ -611,63 +531,64 @@ const CheckoutPage = () => {
                       </span>
                       {address.city && (
                         <span
-                          className={`block text-xs mt-0.5 ${selected ? "text-white/70" : "text-gray-400"}`}
+                          className={`mt-1 block text-[13px] ${selected ? "text-cream/70" : "text-muted"}`}
                         >
                           {address.city}
+                          {address.street ? ` · ${address.street}` : ""}
                         </span>
                       )}
                     </button>
                   );
                 })}
               </div>
-            </section>
+            </Section>
           )}
 
-          {/* Shipping form */}
-          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-              <TruckIcon className="w-[18px] h-[18px] text-primary" />
-              <h2 className="text-base font-semibold text-gray-900">
-                Shipping Details
-              </h2>
-            </div>
-            <div className="px-6 py-5 space-y-4">
-              {/* Two-column name + phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FloatingInput
-                  label="Full Name"
+          <Section
+            number={savedShippingAddresses.length > 0 ? "02" : "01"}
+            title="Shipping details"
+          >
+            <div className="space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field
+                  label="Full name"
                   required
                   name="fullName"
+                  autoComplete="name"
                   value={formData.fullName}
                   onChange={handleChange}
                 />
-                <FloatingInput
-                  label="Phone Number"
+                <Field
+                  label="Phone number"
                   required
                   name="phone"
                   type="tel"
+                  autoComplete="tel"
+                  inputMode="tel"
                   value={formData.phone}
                   onChange={handleChange}
                 />
               </div>
-              <FloatingInput
+              <Field
                 label="City"
                 required
                 name="city"
+                autoComplete="address-level2"
                 value={formData.city}
                 onChange={handleChange}
               />
-              <FloatingInput
-                label="Street Address"
+              <Field
+                label="Street address"
                 required
                 as="textarea"
                 rows={2}
                 name="street"
+                autoComplete="street-address"
                 value={formData.street}
                 onChange={handleChange}
               />
-              <FloatingInput
-                label="Order Notes"
+              <Field
+                label="Order notes"
                 as="textarea"
                 rows={2}
                 name="notes"
@@ -675,360 +596,241 @@ const CheckoutPage = () => {
                 onChange={handleChange}
               />
 
-              {/* Save toggles */}
               {isLoggedIn && (
-                <div className="flex flex-col gap-2 pt-1">
-                  <label className="flex items-center gap-2.5 cursor-pointer group">
-                    <span
-                      className={`
-                                                flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
-                                                ${
-                                                  saveShippingAddress
-                                                    ? "bg-primary border-primary"
-                                                    : "border-gray-300 group-hover:border-gray-400"
-                                                }
-                                            `}
-                    >
-                      {saveShippingAddress && (
-                        <CheckIcon className="w-3 h-3 text-white" />
-                      )}
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={saveShippingAddress}
-                      onChange={(e) => {
-                        const shouldSave = e.target.checked;
-                        setSaveShippingAddress(shouldSave);
-                        if (!shouldSave) setSetAsDefaultAddress(false);
-                      }}
-                      className="sr-only"
-                    />
-                    <span className="text-sm text-gray-600">
-                      Save for next checkout
-                    </span>
-                  </label>
-                  <label
-                    className={`flex items-center gap-2.5 cursor-pointer group ${
-                      !saveShippingAddress
-                        ? "opacity-40 pointer-events-none"
-                        : ""
-                    }`}
+                <div className="pt-1">
+                  <Checkbox
+                    checked={saveShippingAddress}
+                    onChange={(e) => {
+                      const shouldSave = e.target.checked;
+                      setSaveShippingAddress(shouldSave);
+                      if (!shouldSave) setSetAsDefaultAddress(false);
+                    }}
                   >
-                    <span
-                      className={`
-                                                flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
-                                                ${
-                                                  setAsDefaultAddress &&
-                                                  saveShippingAddress
-                                                    ? "bg-primary border-primary"
-                                                    : "border-gray-300 group-hover:border-gray-400"
-                                                }
-                                            `}
-                    >
-                      {setAsDefaultAddress && saveShippingAddress && (
-                        <CheckIcon className="w-3 h-3 text-white" />
-                      )}
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={
-                        savedShippingAddresses.length > 0
-                          ? setAsDefaultAddress
-                          : false
-                      }
-                      disabled={!saveShippingAddress}
-                      onChange={(e) => setSetAsDefaultAddress(e.target.checked)}
-                      className="sr-only"
-                    />
-                    <span className="text-sm text-gray-600">
-                      Set as default
-                    </span>
-                  </label>
+                    Save for next checkout
+                  </Checkbox>
+                  <Checkbox
+                    checked={
+                      savedShippingAddresses.length > 0
+                        ? setAsDefaultAddress
+                        : false
+                    }
+                    disabled={!saveShippingAddress}
+                    onChange={(e) => setSetAsDefaultAddress(e.target.checked)}
+                  >
+                    Set as default
+                  </Checkbox>
                 </div>
               )}
             </div>
-          </section>
+          </Section>
 
-          {/* Payment method */}
-          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-              <CreditCardIcon className="w-[18px] h-[18px] text-primary" />
-              <h2 className="text-base font-semibold text-gray-900">Payment</h2>
-            </div>
-            <div className="px-6 py-5">
-              <label
-                className={`
-                                    flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
-                                    ${
-                                      formData.paymentMethod ===
-                                      "CashOnDelivery"
-                                        ? "border-primary bg-primary/5"
-                                        : "border-gray-200 hover:border-gray-300"
-                                    }
-                                `}
+          <Section
+            number={savedShippingAddresses.length > 0 ? "03" : "02"}
+            title="Payment"
+          >
+            <label
+              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors md:rounded-none md:p-5 ${
+                formData.paymentMethod === "CashOnDelivery"
+                  ? "border-ink"
+                  : "border-ink/20 hover:border-ink/50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="CashOnDelivery"
+                checked={formData.paymentMethod === "CashOnDelivery"}
+                onChange={handleChange}
+                className="peer sr-only"
+              />
+              <span
+                aria-hidden="true"
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink peer-focus-visible:ring-offset-2"
               >
-                <span
-                  className={`
-                                        w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200
-                                        ${
-                                          formData.paymentMethod ===
-                                          "CashOnDelivery"
-                                            ? "border-primary"
-                                            : "border-gray-300"
-                                        }
-                                    `}
-                >
-                  {formData.paymentMethod === "CashOnDelivery" && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-                  )}
+                {formData.paymentMethod === "CashOnDelivery" && (
+                  <span className="h-2.5 w-2.5 rounded-full bg-ink" />
+                )}
+              </span>
+              <span className="flex-1">
+                <span className="block text-[15px]">Cash on delivery</span>
+                <span className="block text-[13px] text-muted">
+                  Pay when your order arrives
                 </span>
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="CashOnDelivery"
-                  checked={formData.paymentMethod === "CashOnDelivery"}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    Cash on Delivery
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Pay when your order arrives
-                  </p>
-                </div>
-              </label>
-            </div>
-          </section>
+              </span>
+              <Cash className="h-6 w-6 shrink-0" />
+            </label>
+          </Section>
         </div>
 
-        {/* ───── RIGHT: Order summary (sticky) ───── */}
-        <div className="lg:col-span-2" ref={summaryRef}>
-          <div className="lg:sticky lg:top-24 space-y-4">
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">
-                  Order Summary
-                </h2>
-              </div>
+        {/* ───── RIGHT: Order summary ───── */}
+        <aside
+          ref={summaryRef}
+          aria-label="Order summary"
+          className="rounded-2xl border border-ink/10 bg-white/50 md:sticky md:top-[var(--bar-h)] md:min-h-[calc(100vh-var(--header-h))] md:rounded-none md:border-0 md:border-l md:border-ink-line md:bg-cream-deep/60"
+        >
+          <h2 className="px-5 pb-2 pt-5 font-serif text-[24px] font-light leading-none md:px-[var(--gutter)] md:pt-10 md:text-[32px]">
+            Order summary
+          </h2>
 
-              {/* Items */}
-              <div className="divide-y divide-gray-50 max-h-[340px] overflow-y-auto">
-                {cart.items.map((item) => {
-                  const product = productDetails[item.productId._id];
-                  const title = product?.title || "Unknown Product";
-                  const { originalPrice, finalPrice } = getDiscountedPrice(
-                    product || {}
-                  );
-                  const hasDiscount = originalPrice > finalPrice;
-                  const image = product?.images?.[0];
+          <ul className="max-h-[340px] divide-y divide-ink/10 overflow-y-auto px-5 md:px-[var(--gutter)]">
+            {cart.items.map((item) => {
+              const product = productDetails[item.productId._id];
+              const title = product?.title || "Unknown Product";
+              const { originalPrice, finalPrice } = getDiscountedPrice(
+                product || {}
+              );
+              const hasDiscount = originalPrice > finalPrice;
+              const image = product?.images?.[0];
 
-                  return (
-                    <div key={item._id} className="flex gap-3 px-6 py-4">
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={
-                            image
-                              ? resolveProductImageUrl(image)
-                              : "/images/fallback-product.png"
-                          }
-                          alt={title}
-                          className="w-14 h-14 object-cover rounded-lg bg-gray-50"
-                          onError={(e) => {
-                            e.target.src = "/images/fallback-product.png";
-                          }}
-                        />
-                        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gray-800 text-white text-[10px] font-bold flex items-center justify-center">
-                          {item.quantity}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-gray-900 truncate">
-                          {title}
-                        </h3>
-                        <div className="flex flex-wrap gap-x-2 text-xs text-gray-400 mt-0.5">
-                          {item.color && <span>Color: {item.color}</span>}
-                          {item.size && <span>Size: {item.size}</span>}
-                        </div>
-                      </div>
-                      <div className="text-right whitespace-nowrap">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {(finalPrice * item.quantity).toFixed(2)}
-                        </p>
-                        {hasDiscount && (
-                          <p className="text-[11px] text-gray-400 line-through">
-                            {(originalPrice * item.quantity).toFixed(2)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Coupon */}
-              <div className="border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setCouponOpen((v) => !v)}
-                  className="w-full px-6 py-3 flex items-center justify-between text-sm hover:bg-gray-50 transition-colors"
-                >
-                  <span className="flex items-center gap-2 text-gray-600 font-medium">
-                    <TagIcon className="w-4 h-4" />
-                    {appliedCoupon ? "Coupon applied" : "Have a coupon?"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${couponOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              return (
+                <li key={item._id} className="flex gap-3.5 py-4">
+                  <div className="relative shrink-0">
+                    <SmartImage
+                      src={image}
+                      alt={title}
+                      width={160}
+                      sizes="64px"
+                      className="h-16 w-16 rounded-lg object-cover md:rounded-none"
                     />
-                  </svg>
-                </button>
-
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    couponOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="px-6 pb-4 space-y-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={couponCode}
-                        onChange={handleCouponChange}
-                        placeholder={
-                          isLoggedIn ? "Enter code" : "Login to use coupons"
-                        }
-                        disabled={appliedCoupon !== null || !isLoggedIn}
-                        className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-gray-50 disabled:text-gray-400"
-                      />
-                      {!appliedCoupon ? (
-                        <button
-                          type="button"
-                          onClick={handleApplyCoupon}
-                          disabled={applying || !isLoggedIn}
-                          className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-black disabled:bg-gray-300 transition-colors whitespace-nowrap"
-                        >
-                          {applying ? "..." : "Apply"}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={handleRemoveCoupon}
-                          disabled={removing}
-                          className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors whitespace-nowrap"
-                        >
-                          {removing ? "..." : "Remove"}
-                        </button>
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-ink px-1 text-[10px] text-cream">
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate font-sans text-[14px] tracking-normal">
+                      {title}
+                    </h3>
+                    <p className="mt-0.5 flex flex-wrap gap-x-2 text-[12px] text-muted">
+                      {item.color && !item.color.startsWith("#") && (
+                        <span>Colour: {item.color}</span>
                       )}
-                    </div>
-                    {appliedCoupon && (
-                      <p className="text-green-600 text-xs font-medium flex items-center gap-1">
-                        <CheckIcon className="w-3.5 h-3.5" />
-                        You saved {(appliedCoupon.discount || 0).toFixed(
-                          2
-                        )}{" "}
-                        <Currency className="text-xs" />
+                      {item.size && <span>Format: {item.size}</span>}
+                    </p>
+                  </div>
+                  <div className="whitespace-nowrap text-right">
+                    <p className="text-[14px] tabular-nums">
+                      {formatMoney(finalPrice * item.quantity)}
+                    </p>
+                    {hasDiscount && (
+                      <p className="text-[12px] tabular-nums text-muted line-through">
+                        {formatMoney(originalPrice * item.quantity)}
                       </p>
                     )}
                   </div>
-                </div>
-              </div>
+                </li>
+              );
+            })}
+          </ul>
 
-              {/* Totals */}
-              <div className="border-t border-gray-100 px-6 py-5 space-y-3">
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Subtotal</span>
-                  <span>
-                    {cart.total.toFixed(2)} <Currency className="text-xs" />
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Shipping</span>
-                  <span className="text-green-600 font-medium">Free</span>
-                </div>
-                {appliedCoupon && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Coupon Discount</span>
-                    <span>
-                      -{parseFloat(appliedCoupon.discount).toFixed(2)}
-                    </span>
+          {/* Coupon */}
+          <div className="border-t border-ink/10 md:border-ink-line">
+            <button
+              type="button"
+              onClick={() => setCouponOpen((v) => !v)}
+              aria-expanded={couponOpen}
+              className="flex min-h-[52px] w-full items-center justify-between px-5 text-[14px] md:px-[var(--gutter)]"
+            >
+              <span className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                {appliedCoupon ? "Coupon applied" : "Have a coupon?"}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-200 ${couponOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            <div
+              className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                couponOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="space-y-2 px-5 pb-5 md:px-[var(--gutter)]">
+                  <div className="flex gap-2">
+                    <label htmlFor="coupon-code" className="sr-only">
+                      Coupon code
+                    </label>
+                    <input
+                      id="coupon-code"
+                      type="text"
+                      value={couponCode}
+                      onChange={handleCouponChange}
+                      placeholder={
+                        isLoggedIn ? "Enter code" : "Log in to use coupons"
+                      }
+                      disabled={appliedCoupon !== null || !isLoggedIn}
+                      className="field min-w-0 flex-1"
+                    />
+                    {!appliedCoupon ? (
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={applying || !isLoggedIn}
+                        className="btn btn-outline btn-md shrink-0 !h-12"
+                      >
+                        <span>{applying ? "…" : "Apply"}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        disabled={removing}
+                        className="btn btn-outline btn-md shrink-0 !h-12"
+                      >
+                        <span>{removing ? "…" : "Remove"}</span>
+                      </button>
+                    )}
                   </div>
-                )}
-                <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between">
-                  <span className="text-base font-bold text-gray-900">
-                    Total
-                  </span>
-                  <span className="text-lg font-extrabold text-gray-900">
-                    {orderTotal.toFixed(2)}{" "}
-                    <Currency className="text-sm font-semibold" />
-                  </span>
+                  {appliedCoupon && (
+                    <p className="flex items-center gap-1.5 text-[13px] text-ink">
+                      <Check className="h-4 w-4" strokeWidth={2} />
+                      You saved {formatMoney(appliedCoupon.discount || 0)}
+                    </p>
+                  )}
                 </div>
               </div>
-            </section>
+            </div>
+          </div>
 
-            {/* Place Order button */}
+          {/* Totals */}
+          <div className="space-y-3 border-t border-ink/10 px-5 py-5 md:border-ink-line md:px-[var(--gutter)] md:py-7">
+            <SummaryRow label="Subtotal">{formatMoney(cart.total)}</SummaryRow>
+            <SummaryRow label="Shipping">Free</SummaryRow>
+            {appliedCoupon && (
+              <SummaryRow label="Coupon discount">
+                −{formatMoney(parseFloat(appliedCoupon.discount))}
+              </SummaryRow>
+            )}
+            <div className="border-t border-ink/15 pt-4">
+              <SummaryRow label="Total" strong>
+                {formatMoney(orderTotal)}
+              </SummaryRow>
+            </div>
+
             <button
               type="submit"
               disabled={submitting}
-              className={`
-                                w-full py-4 text-white font-bold text-base rounded-2xl transition-all duration-200
-                                flex items-center justify-center gap-2
-                                ${
-                                  submitting
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-primary hover:bg-black active:scale-[0.98] shadow-lg shadow-primary/20 hover:shadow-black/20"
-                                }
-                            `}
+              className="btn btn-solid btn-lg mt-5 hidden w-full !px-5 md:inline-flex"
             >
-              {submitting ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  Place Order — {orderTotal.toFixed(2)}{" "}
-                  <Currency className="text-sm" />
-                </>
-              )}
+              {placeOrderLabel}
             </button>
-
-            {/* Trust signals */}
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-400 pt-1">
-              <span className="flex items-center gap-1">
-                <ShieldIcon className="w-3.5 h-3.5" /> Secure checkout
-              </span>
-              <span className="w-px h-3 bg-gray-200" />
-              <span className="flex items-center gap-1">
-                <TruckIcon className="w-3.5 h-3.5" /> Fast delivery
-              </span>
-            </div>
+            <p className="pt-1 text-center text-[12px] text-muted">
+              Secure checkout · Cash on delivery
+            </p>
           </div>
+        </aside>
+
+        {/* Mobile: docked place-order bar above the tab bar */}
+        <div className="bottom-tabbar fixed inset-x-0 z-40 border-t border-ink/10 bg-cream/95 px-4 py-3 backdrop-blur-lg md:hidden">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn btn-solid btn-md h-12 w-full"
+          >
+            {placeOrderLabel}
+          </button>
         </div>
+        <div className="h-20 md:hidden" aria-hidden="true" />
       </form>
     </main>
   );
