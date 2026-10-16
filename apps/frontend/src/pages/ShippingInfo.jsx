@@ -1,97 +1,23 @@
 // src/pages/ShippingInfo.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-/* ───────────── icons ───────────── */
-const Icon = ({ children, className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={`w-5 h-5 ${className}`}
-  >
-    {children}
-  </svg>
-);
-const TruckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.079-.504 1.036-1.124a20.916 20.916 0 0 0-1.395-5.88 2.12 2.12 0 0 0-1.81-1.246h-3.362a2.1 2.1 0 0 1-1.27-.432l-.727-.545a2.1 2.1 0 0 0-1.27-.432H9.12a2.1 2.1 0 0 0-1.478.604L6.3 11.25H4.875c-.621 0-1.125.504-1.125 1.125v3.75"
-    />
-  </Icon>
-);
-const MapPinIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-    />
-  </Icon>
-);
-const ClockIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-    />
-  </Icon>
-);
-const ArrowRightIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-    />
-  </Icon>
-);
-const CheckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m4.5 12.75 6 6 9-13.5"
-    />
-  </Icon>
-);
-const ShieldCheckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
-    />
-  </Icon>
-);
-const MagnifyingGlassIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-    />
-  </Icon>
-);
-const ChevronDownIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m19.5 8.25-7.5 7.5-7.5-7.5"
-    />
-  </Icon>
-);
+import { PageHeader, Eyebrow } from "../components/ui/Primitives";
+import Pill from "../components/ui/Pill";
+import Reveal from "../components/ui/Reveal";
+import SmartImage from "../components/ui/SmartImage";
+import {
+  ArrowRight,
+  Check,
+  Clock,
+  Search,
+  Truck,
+} from "../components/ui/Icons";
+import {
+  AccordionItem,
+  PinIcon,
+  ShieldIcon,
+  useCategoryImages,
+} from "./info/InfoKit";
 
 /* ───────────── data ───────────── */
 const deliveryZones = [
@@ -99,7 +25,6 @@ const deliveryZones = [
     city: "Cairo & Giza",
     time: "1–2 Days",
     details: "Orders before 3 PM ship same day when stock is available.",
-    icon: "🏙️",
     highlight: true,
   },
   {
@@ -107,14 +32,12 @@ const deliveryZones = [
     time: "2–4 Days",
     details:
       "Alexandria, Mansoura, Tanta, and nearby cities via trusted partners.",
-    icon: "🏢",
     highlight: false,
   },
   {
     city: "Nationwide",
     time: "3–6 Days",
     details: "Remote destinations may require additional transit time.",
-    icon: "🗺️",
     highlight: false,
   },
 ];
@@ -150,36 +73,31 @@ const faqs = [
   },
 ];
 
-/* ───────────── FAQ accordion item ───────────── */
-const FaqItem = ({ q, a, open, toggle }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-200 hover:border-gray-200">
-    <button
-      onClick={toggle}
-      className="w-full flex items-center justify-between p-5 text-left"
+/* Left editorial column used by the Karst-style split sections. */
+const SectionIntro = ({ eyebrow, title, id, children, className = "" }) => (
+  <Reveal
+    className={`px-4 pb-4 md:border-r md:border-ink-line md:px-[var(--gutter)] md:py-16 ${className}`}
+  >
+    <Eyebrow className="mb-2 text-muted md:mb-4">{eyebrow}</Eyebrow>
+    <h2
+      id={id}
+      className="font-serif text-[26px] font-light leading-none tracking-tight md:text-display"
     >
-      <span className="text-sm font-bold text-gray-900 pr-4">{q}</span>
-      <span
-        className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-all duration-200 ${open ? "bg-primary rotate-180" : "bg-gray-100"}`}
-      >
-        <ChevronDownIcon
-          className={`w-3.5 h-3.5 ${open ? "text-white" : "text-gray-500"}`}
-        />
-      </span>
-    </button>
-    <div
-      className="overflow-hidden transition-all duration-300"
-      style={{ maxHeight: open ? "200px" : "0" }}
-    >
-      <p className="px-5 pb-5 text-sm text-gray-500 leading-relaxed">{a}</p>
-    </div>
-  </div>
+      {title}
+    </h2>
+    {children}
+  </Reveal>
 );
+
+const splitGrid =
+  "grid md:grid-cols-[minmax(320px,38%)_1fr] md:border-b md:border-ink-line lg:grid-cols-[minmax(380px,29%)_1fr]";
 
 /* ───────────── main component ───────────── */
 const ShippingInfo = () => {
   const [orderId, setOrderId] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
   const navigate = useNavigate();
+  const images = useCategoryImages();
 
   const handleTrack = (e) => {
     e.preventDefault();
@@ -188,213 +106,194 @@ const ShippingInfo = () => {
   };
 
   return (
-    <main className="text-gray-900">
+    <div className="text-ink">
       {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative overflow-hidden bg-surface py-20 sm:py-24 px-6">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/[0.02] rounded-full -translate-x-1/2 translate-y-1/2" />
-
-        <div className="max-w-3xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-6">
-            <TruckIcon className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-              Shipping
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-4">
-            Shipping & Delivery
-          </h1>
-          <p className="text-gray-500 text-sm sm:text-base max-w-lg mx-auto mb-8 leading-relaxed">
-            We ship Notervo notebooks with careful packaging and predictable
-            timelines across Egypt.
-          </p>
-          <Link
-            to="/shop"
-            className="group inline-flex items-center gap-2 px-7 py-3 bg-primary text-white font-semibold text-sm rounded-xl hover:bg-black transition-colors shadow-lg shadow-primary/15"
-          >
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-2">
+            <Truck className="h-3.5 w-3.5" /> Shipping
+          </span>
+        }
+        title="Shipping & Delivery"
+        description="We ship Notervo notebooks with careful packaging and predictable timelines across Egypt."
+        actions={
+          <Pill to="/shop" size="lg" arrow className="w-full sm:w-auto">
             Start Shopping
-            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
-      </section>
+          </Pill>
+        }
+        className="[&>div>div:last-child]:w-full sm:[&>div>div:last-child]:w-auto"
+      />
 
       {/* ═══════════════ DELIVERY ZONES ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              Timelines
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Delivery Information
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {deliveryZones.map(({ city, time, details, icon, highlight }) => (
-              <div
-                key={city}
-                className={`group bg-white rounded-2xl border shadow-sm hover:shadow-lg p-6 text-center transition-all duration-300 ${
-                  highlight
-                    ? "border-primary/20 ring-1 ring-primary/5"
-                    : "border-gray-100 hover:border-gray-200"
-                }`}
-              >
+      <section aria-labelledby="timelines-title" className={splitGrid}>
+        <SectionIntro
+          eyebrow="Timelines"
+          title="Delivery Information"
+          id="timelines-title"
+        />
+        <ul className="mx-4 overflow-hidden rounded-2xl border border-ink/10 bg-white/60 md:mx-0 md:grid md:grid-cols-3 md:rounded-none md:border-0 md:bg-transparent">
+          {deliveryZones.map(({ city, time, details, highlight }, i) => (
+            <Reveal
+              as="li"
+              key={city}
+              delay={i * 80}
+              className="flex flex-col border-b border-ink/10 p-4 last:border-b-0 md:border-b-0 md:border-r md:border-ink-line md:px-8 md:py-16 md:last:border-r-0"
+            >
+              <div className="hidden items-center justify-between gap-3 md:flex">
+                <span className="font-serif text-[15px] text-muted">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {highlight && (
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold uppercase tracking-wider mb-3">
-                    Fastest
-                  </span>
+                  <span className="badge bg-ink text-cream">Fastest</span>
                 )}
-                <div className="text-3xl mb-3">{icon}</div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">
+              </div>
+              <div className="flex items-center justify-between gap-3 md:block">
+                <h3 className="flex items-center gap-2 font-sans text-[16px] font-medium md:mt-12 md:font-serif md:text-[30px] md:font-light md:leading-tight">
                   {city}
+                  {highlight && (
+                    <span className="badge bg-ink text-cream md:hidden">
+                      Fastest
+                    </span>
+                  )}
                 </h3>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-primary/5 mb-3">
-                  <ClockIcon className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-sm font-bold text-primary">{time}</span>
-                </div>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  {details}
+                <p className="flex shrink-0 items-center gap-1.5 text-[14px] md:mt-4 md:gap-2 md:text-[18px]">
+                  <Clock className="h-4 w-4" />
+                  {time}
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
+              <p className="mt-1.5 text-[13px] leading-snug text-muted md:mt-4 md:text-[15px]">
+                {details}
+              </p>
+            </Reveal>
+          ))}
+        </ul>
       </section>
 
       {/* ═══════════════ SHIPPING RATES ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6 bg-surface">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              Pricing
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Shipping Rates
-            </h2>
-            <p className="text-gray-500 text-sm mt-2">
-              Clear pricing for every location.
-            </p>
-          </div>
+      <section
+        aria-labelledby="rates-title"
+        className={`mt-10 md:mt-0 ${splitGrid}`}
+      >
+        <SectionIntro eyebrow="Pricing" title="Shipping Rates" id="rates-title">
+          <p className="mt-3 text-[14px] text-muted md:mt-6 md:text-[16px] md:text-ink/80">
+            Clear pricing for every location.
+          </p>
+        </SectionIntro>
 
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {/* Table header */}
-            <div className="grid grid-cols-2 gap-4 px-6 py-3.5 bg-gray-50/80 border-b border-gray-100">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+        <Reveal className="px-4 md:px-[var(--gutter)] md:py-16 lg:px-20">
+          <div className="overflow-hidden rounded-2xl border border-ink/10 bg-white/60 md:rounded-none md:border-0 md:bg-transparent">
+            <div className="grid grid-cols-2 gap-4 border-b border-ink/10 px-4 py-3 md:border-ink-line md:px-0">
+              <span className="text-[12px] uppercase tracking-[0.02em] text-muted">
                 Location
               </span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">
+              <span className="text-right text-[12px] uppercase tracking-[0.02em] text-muted">
                 Cost
               </span>
             </div>
-
-            {/* Rows */}
-            {shippingRates.map(({ location, cost, highlight }, i) => (
+            {shippingRates.map(({ location, cost, highlight }) => (
               <div
                 key={location}
-                className={`grid grid-cols-2 gap-4 px-6 py-4 items-center ${i < shippingRates.length - 1 ? "border-b border-gray-50" : ""}`}
+                className="grid grid-cols-2 items-center gap-4 border-b border-ink/10 px-4 py-4 last:border-b-0 md:border-ink-line md:px-0 md:py-6 md:last:border-b"
               >
-                <span className="text-sm text-gray-900 font-medium">
+                <span className="text-[15px] md:font-serif md:text-[24px] md:font-light">
                   {location}
                 </span>
-                <span
-                  className={`text-sm font-bold text-right ${highlight ? "text-green-600" : "text-gray-900"}`}
-                >
-                  {highlight && (
-                    <span className="inline-flex items-center gap-1">
-                      <CheckIcon className="w-3.5 h-3.5" />
-                    </span>
-                  )}{" "}
+                <span className="inline-flex items-center justify-end gap-1.5 text-right text-[15px] font-medium md:text-[18px] md:font-normal">
+                  {highlight && <Check className="h-4 w-4" />}
                   {cost}
                 </span>
               </div>
             ))}
           </div>
 
-          <p className="text-center mt-5 text-xs text-gray-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 border border-green-100 text-green-700 font-semibold text-xs">
-              <TruckIcon className="w-3.5 h-3.5" />
-              Free shipping on orders over EGP 999
-            </span>
+          <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-periwinkle px-4 py-2 text-[13px] md:mt-8">
+            <Truck className="h-4 w-4" />
+            Free shipping on orders over EGP 999
           </p>
-        </div>
+        </Reveal>
       </section>
 
-      {/* ═══════════════ RETURNS ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              Returns
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-4">
-              Returns & Exchanges
-            </h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-6">
-              You can request a return within{" "}
-              <strong className="text-gray-900">14 days</strong> of delivery for
-              eligible notebook items.
-            </p>
+      {/* ═══════════════ RETURNS (two-up) ═══════════════ */}
+      <section
+        aria-labelledby="returns-title"
+        className="mt-10 grid md:mt-0 md:grid-cols-2 md:border-b md:border-ink-line"
+      >
+        <Reveal className="flex flex-col px-4 md:px-[var(--gutter)] md:py-16 lg:px-20 lg:py-20">
+          <Eyebrow className="mb-2 text-muted md:mb-5">Returns</Eyebrow>
+          <h2
+            id="returns-title"
+            className="font-serif text-[26px] font-light leading-none tracking-tight md:text-display"
+          >
+            Returns & Exchanges
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-ink/80 md:mt-6 md:text-[17px]">
+            You can request a return within{" "}
+            <strong className="font-medium text-ink">14 days</strong> of
+            delivery for eligible notebook items.
+          </p>
 
-            <div className="space-y-3 mb-8">
-              {returnPoints.map((point, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckIcon className="w-3 h-3 text-primary" />
-                  </span>
-                  <span className="text-sm text-gray-600 leading-relaxed">
-                    {point}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <ul className="mt-5 border-t border-ink/15 md:mt-8 md:border-ink-line">
+            {returnPoints.map((point) => (
+              <li
+                key={point}
+                className="flex items-start gap-3 border-b border-ink/15 py-3.5 text-[14px] leading-snug md:border-ink-line md:py-4 md:text-[15px]"
+              >
+                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                {point}
+              </li>
+            ))}
+          </ul>
 
-            <Link
+          <div className="mt-6 md:mt-10">
+            <Pill
               to="/contact"
-              className="group inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold text-sm rounded-xl hover:bg-black transition-colors shadow-lg shadow-primary/15"
+              variant="outline"
+              size="lg"
+              arrow
+              className="w-full sm:w-auto"
             >
               Request Return
-              <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            </Pill>
           </div>
+        </Reveal>
 
-          <div className="relative">
-            <div className="rounded-2xl overflow-hidden shadow-2xl shadow-gray-200/50">
-              <img
-                src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1200&q=80"
-                alt="Notebook packaging"
-                className="w-full h-auto object-cover"
-                loading="lazy"
-              />
-            </div>
-            <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl border border-gray-100 shadow-xl px-5 py-4 hidden sm:block">
-              <p className="text-2xl font-extrabold text-gray-900">14</p>
-              <p className="text-xs text-gray-500 font-medium">
-                Days to return
-              </p>
-            </div>
+        <div className="relative order-first mx-4 mb-6 aspect-[4/3] overflow-hidden rounded-2xl bg-cream-dim md:order-none md:mx-0 md:mb-0 md:aspect-auto md:min-h-[600px] md:rounded-none md:border-l md:border-ink-line">
+          <SmartImage
+            src={images[2] || images[0]}
+            alt="Notebook packaging"
+            width={1400}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute bottom-4 right-4 bg-cream px-4 py-3 text-right md:bottom-8 md:right-8 md:px-5 md:py-4">
+            <p className="font-serif text-[26px] font-light leading-none md:text-[34px]">
+              14
+            </p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.02em] text-muted">
+              Days to return
+            </p>
           </div>
         </div>
       </section>
 
       {/* ═══════════════ TRACK ORDER ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6 bg-surface">
-        <div className="max-w-2xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-            <span className="w-6 h-px bg-primary" />
-            Tracking
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+      <section
+        aria-labelledby="track-title"
+        className="mx-4 mt-10 rounded-2xl bg-cream-deep p-5 md:mx-0 md:mt-0 md:rounded-none md:border-b md:border-ink-line md:px-[var(--gutter)] md:py-20"
+      >
+        <Reveal className="md:mx-auto md:max-w-2xl md:text-center">
+          <Eyebrow className="mb-2 text-muted md:mb-4">Tracking</Eyebrow>
+          <h2
+            id="track-title"
+            className="font-serif text-[26px] font-light leading-none tracking-tight md:text-display"
+          >
             Track Your Order
           </h2>
-          <p className="text-gray-500 text-sm mb-8">
+          <p className="mt-3 text-[14px] text-muted md:mt-5 md:text-[16px]">
             Enter your order ID to check status, or visit{" "}
             <Link
               to="/profile"
-              className="text-primary font-medium hover:underline"
+              className="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
             >
               My Orders
             </Link>
@@ -403,110 +302,104 @@ const ShippingInfo = () => {
 
           <form
             onSubmit={handleTrack}
-            className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto"
+            className="mt-5 flex flex-col gap-3 sm:flex-row md:mx-auto md:mt-10 md:max-w-lg"
           >
+            <label htmlFor="track-order-id" className="sr-only">
+              Order ID
+            </label>
             <div className="relative flex-1">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <MagnifyingGlassIcon className="w-4 h-4" />
-              </span>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
               <input
+                id="track-order-id"
                 type="text"
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
                 placeholder="Enter order ID"
-                className="w-full pl-11 pr-4 py-3 text-sm bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                className="field pl-11"
               />
             </div>
             <button
               type="submit"
               disabled={!orderId.trim()}
-              className="px-7 py-3 bg-primary text-white font-bold text-sm rounded-xl hover:bg-black transition-colors shadow-lg shadow-primary/15 disabled:opacity-50 disabled:pointer-events-none flex-shrink-0"
+              className="btn btn-solid btn-md shrink-0"
             >
-              Track
+              <span>Track</span>
             </button>
           </form>
-        </div>
+        </Reveal>
       </section>
 
       {/* ═══════════════ FAQ ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              FAQ
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map(({ q, a }, i) => (
-              <FaqItem
-                key={q}
-                q={q}
-                a={a}
-                open={openFaq === i}
-                toggle={() => setOpenFaq(openFaq === i ? null : i)}
-              />
-            ))}
-          </div>
+      <section
+        aria-labelledby="faq-title"
+        className={`mt-10 md:mt-0 ${splitGrid}`}
+      >
+        <SectionIntro
+          eyebrow="FAQ"
+          title="Frequently Asked Questions"
+          id="faq-title"
+        />
+        <div className="mx-4 rounded-2xl border border-ink/10 bg-white/60 px-4 md:mx-0 md:rounded-none md:border-0 md:bg-transparent md:px-[var(--gutter)] md:py-12 lg:px-20">
+          {faqs.map(({ q, a }, i) => (
+            <AccordionItem
+              key={q}
+              question={q}
+              answer={a}
+              open={openFaq === i}
+              onToggle={() => setOpenFaq(openFaq === i ? null : i)}
+            />
+          ))}
         </div>
       </section>
 
       {/* ═══════════════ BOTTOM CTA ═══════════════ */}
-      <section className="py-16 sm:py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-primary px-8 py-14 sm:px-14 sm:py-16 text-center">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
-
-            <div className="relative z-10">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-2">
+      <section
+        aria-labelledby="cta-title"
+        className="px-4 py-8 md:px-0 md:py-0"
+      >
+        <Reveal className="rounded-[28px] bg-ink p-6 text-cream md:rounded-none md:px-[var(--gutter)] md:py-20 lg:py-24">
+          <div className="lg:flex lg:items-end lg:justify-between lg:gap-10">
+            <div className="max-w-2xl">
+              <h2
+                id="cta-title"
+                className="font-serif text-[26px] font-light leading-[1.02] md:text-display-lg"
+              >
                 Ready to Order Your Next Notebook?
               </h2>
-              <p className="text-sm text-gray-300 max-w-md mx-auto mb-6 leading-relaxed">
+              <p className="mt-3 text-[14px] leading-snug text-cream/75 md:mt-5 md:text-[17px]">
                 Fast delivery, clear return policy, and consistent notebook
                 quality.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Link
-                  to="/shop"
-                  className="group inline-flex items-center gap-2 px-7 py-3 bg-white text-primary font-bold text-sm rounded-xl hover:bg-gray-100 transition-all shadow-lg shadow-black/20"
-                >
-                  Browse Notebooks
-                  <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 px-7 py-3 border-2 border-white/15 text-white/70 font-semibold text-sm rounded-xl hover:border-white/30 hover:text-white transition-all"
-                >
-                  Contact Support
-                </Link>
-              </div>
-
-              {/* Trust badges */}
-              <div className="flex items-center justify-center gap-6 mt-8">
-                {[
-                  { icon: TruckIcon, text: "Fast delivery" },
-                  { icon: ShieldCheckIcon, text: "Secure packaging" },
-                  { icon: MapPinIcon, text: "Egypt-wide" },
-                ].map(({ icon: Ico, text }) => (
-                  <span
-                    key={text}
-                    className="flex items-center gap-1.5 text-[11px] text-white/40"
-                  >
-                    <Ico className="w-3.5 h-3.5" />
-                    {text}
-                  </span>
-                ))}
-              </div>
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row md:mt-8 lg:mt-0 lg:shrink-0">
+              <Link to="/shop" className="btn btn-cream btn-lg">
+                <span>Browse Notebooks</span>
+                <ArrowRight className="btn-icon h-[18px] w-[18px]" />
+              </Link>
+              <Pill to="/contact" variant="light" size="lg">
+                Contact Support
+              </Pill>
             </div>
           </div>
-        </div>
+
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-cream/15 pt-6 md:mt-14">
+            {[
+              { icon: Truck, text: "Fast delivery" },
+              { icon: ShieldIcon, text: "Secure packaging" },
+              { icon: PinIcon, text: "Egypt-wide" },
+            ].map(({ icon: Ico, text }) => (
+              <li
+                key={text}
+                className="flex items-center gap-2 text-[12px] uppercase tracking-[0.02em] text-cream/70"
+              >
+                <Ico className="h-4 w-4" />
+                {text}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
       </section>
-    </main>
+    </div>
   );
 };
 

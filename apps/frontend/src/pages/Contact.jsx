@@ -3,102 +3,27 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { showError, showSuccess } from "../utils/Toast";
-
-/* ───────────── icons ───────────── */
-const Icon = ({ children, className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={`w-5 h-5 ${className}`}
-  >
-    {children}
-  </svg>
-);
-const ChatIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-    />
-  </Icon>
-);
-const MailIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-    />
-  </Icon>
-);
-const ClockIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-    />
-  </Icon>
-);
-const ShieldIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
-    />
-  </Icon>
-);
-const ArrowRightIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-    />
-  </Icon>
-);
-const CheckCircleIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-    />
-  </Icon>
-);
-const SpinnerIcon = ({ className = "" }) => (
-  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-    />
-  </svg>
-);
+import { PageHeader, Eyebrow } from "../components/ui/Primitives";
+import Reveal from "../components/ui/Reveal";
+import {
+  ArrowRight,
+  Chat,
+  Check,
+  Clock,
+  Spinner,
+} from "../components/ui/Icons";
+import { MailIcon, ShieldIcon } from "./info/InfoKit";
 
 /* ───────────── info cards data ───────────── */
 const infoCards = [
   {
-    icon: ChatIcon,
+    icon: Chat,
     title: "Send a Message",
     description:
       "Use the form below and our team will respond within 24 hours.",
   },
   {
-    icon: ClockIcon,
+    icon: Clock,
     title: "Quick Response",
     description:
       "We reply to all messages during business hours, usually same-day.",
@@ -157,137 +82,129 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="text-gray-900">
-      {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative overflow-hidden bg-primary py-20 sm:py-24">
-        {/* Decorative */}
-        <div className="absolute top-0 left-0 w-80 h-80 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
-        <div className="absolute top-1/3 right-16 w-16 h-16 bg-white/5 rounded-full" />
+    <div className="text-ink">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-2">
+            <MailIcon className="h-3.5 w-3.5" /> Get in Touch
+          </span>
+        }
+        title="Contact Notervo"
+        description="Questions about notebooks, orders, or delivery? Send a message and our team will reply shortly."
+      />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center px-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6">
-            <MailIcon className="w-3.5 h-3.5 text-gray-300" />
-            <span className="text-xs font-semibold text-gray-200 uppercase tracking-wider">
-              Get in Touch
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Contact Notervo
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
-            Questions about notebooks, orders, or delivery? Send a message and
-            our team will reply shortly.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════ INFO CARDS ═══════════════ */}
-      <section className="max-w-4xl mx-auto px-6 -mt-8 relative z-20">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {infoCards.map(({ icon: Ico, title, description }) => (
-            <div
-              key={title}
-              className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 p-5 text-center"
-            >
-              <span className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-3">
-                <Ico className="w-5 h-5 text-primary" />
-              </span>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                {description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════ FORM ═══════════════ */}
-      <section className="max-w-2xl mx-auto px-6 py-16 sm:py-20">
-        {sent ? (
-          /* ───── Success state ───── */
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-green-50 flex items-center justify-center">
-              <CheckCircleIcon className="w-8 h-8 text-green-500" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              Message Sent!
-            </h2>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed max-w-sm mx-auto">
-              Thank you for reaching out. We'll review your message and get back
-              to you as soon as possible.
-            </p>
-            <button
-              onClick={() => setSent(false)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-primary border-2 border-gray-200 rounded-xl hover:border-primary transition-all"
-            >
-              Send Another Message
-            </button>
-          </div>
-        ) : (
-          /* ───── Form ───── */
-          <>
-            <div className="mb-8">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-                <span className="w-6 h-px bg-primary" />
-                Contact Form
-              </span>
-              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">
-                Send Us a Message
-              </h2>
-              <p className="text-sm text-gray-500">
-                Share your question and we'll respond with a clear next step.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2"
-                >
-                  Your Message *
-                </label>
-                <textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows="6"
-                  required
-                  placeholder="Tell us how we can help..."
-                  className="w-full px-4 py-4 text-sm border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary resize-none transition-all hover:border-gray-300"
-                  autoFocus
-                />
-                <div className="flex justify-between mt-1.5 px-1">
-                  <p className="text-[11px] text-gray-400">
-                    Be as descriptive as possible.
-                  </p>
-                  <p
-                    className={`text-[11px] font-medium ${message.length > 1000 ? "text-red-500" : "text-gray-400"}`}
-                  >
-                    {message.length}/1000
+      <div className="grid md:grid-cols-[minmax(320px,38%)_1fr] lg:grid-cols-[minmax(380px,29%)_1fr]">
+        {/* ═══════════════ INFO ═══════════════ */}
+        <aside className="order-2 px-4 pb-10 md:order-1 md:border-r md:border-ink-line md:px-[var(--gutter)] md:py-14">
+          <Eyebrow className="mb-3 hidden text-muted md:mb-6 md:block">
+            How we help
+          </Eyebrow>
+          <ul className="overflow-hidden rounded-2xl border border-ink/10 bg-white/60 md:rounded-none md:border-0 md:bg-transparent">
+            {infoCards.map(({ icon: Ico, title, description }, i) => (
+              <Reveal
+                as="li"
+                key={title}
+                delay={i * 80}
+                className="flex gap-4 border-b border-ink/10 p-4 last:border-b-0 md:border-ink-line md:px-0 md:py-6 md:first:border-t md:last:border-b"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/15 md:h-11 md:w-11 md:border-ink">
+                  <Ico className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-sans text-[15px] font-medium md:text-[17px] md:font-normal">
+                    {title}
+                  </h2>
+                  <p className="mt-1 text-[13px] leading-snug text-muted md:text-[14px]">
+                    {description}
                   </p>
                 </div>
-              </div>
+              </Reveal>
+            ))}
+          </ul>
+        </aside>
 
+        {/* ═══════════════ FORM ═══════════════ */}
+        <section className="order-1 px-4 pb-8 md:order-2 md:px-[var(--gutter)] md:py-14 lg:px-20 lg:py-20">
+          {sent ? (
+            /* ───── Success state ───── */
+            <div className="flex flex-col items-center rounded-2xl border border-ink/10 bg-white/60 px-6 py-12 text-center md:max-w-xl md:items-start md:rounded-none md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-left">
+              <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream">
+                <Check className="h-6 w-6" />
+              </span>
+              <h2 className="font-serif text-[28px] font-light leading-tight md:text-display">
+                Message Sent!
+              </h2>
+              <p className="mt-3 max-w-sm text-[15px] leading-snug text-muted">
+                Thank you for reaching out. We'll review your message and get
+                back to you as soon as possible.
+              </p>
               <button
-                type="submit"
-                disabled={isSubmitting || !message.trim()}
-                className="group w-full flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-bold text-sm rounded-xl hover:bg-black transition-all duration-200 shadow-lg shadow-primary/20 hover:shadow-black/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                type="button"
+                onClick={() => setSent(false)}
+                className="btn btn-outline btn-md mt-8"
               >
-                {isSubmitting ? (
-                  <SpinnerIcon className="w-5 h-5" />
-                ) : (
-                  <>
-                    Send Message
-                    <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </>
-                )}
+                <span>Send Another Message</span>
               </button>
-            </form>
-          </>
-        )}
-      </section>
-    </main>
+            </div>
+          ) : (
+            /* ───── Form ───── */
+            <div className="rounded-2xl border border-ink/10 bg-white/60 p-5 md:max-w-2xl md:rounded-none md:border-0 md:bg-transparent md:p-0">
+              <Eyebrow className="mb-3 text-muted md:mb-5">
+                Contact Form
+              </Eyebrow>
+              <h2 className="font-serif text-[26px] font-light leading-tight md:text-display">
+                Send Us a Message
+              </h2>
+              <p className="mt-2 text-[14px] leading-snug text-muted md:mt-4 md:text-[16px]">
+                Share your question and we'll respond with a clear next step.
+              </p>
+
+              <form onSubmit={handleSubmit} className="mt-6 space-y-5 md:mt-10">
+                <div>
+                  <label htmlFor="message" className="field-label">
+                    Your Message *
+                  </label>
+                  <textarea
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows="6"
+                    required
+                    placeholder="Tell us how we can help..."
+                    className="field resize-none"
+                    autoFocus
+                  />
+                  <div className="mt-2 flex justify-between px-1">
+                    <p className="text-[12px] text-muted">
+                      Be as descriptive as possible.
+                    </p>
+                    <p
+                      className={`text-[12px] tabular-nums ${message.length > 1000 ? "text-ember" : "text-muted"}`}
+                    >
+                      {message.length}/1000
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !message.trim()}
+                  className="btn btn-solid btn-lg w-full md:w-auto md:min-w-[260px]"
+                >
+                  {isSubmitting ? (
+                    <Spinner className="h-5 w-5" />
+                  ) : (
+                    <>
+                      <span>Send Message</span>
+                      <ArrowRight className="btn-icon h-[18px] w-[18px]" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
   );
 }

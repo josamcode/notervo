@@ -1,73 +1,14 @@
 // src/pages/About.jsx
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import { showError, showSuccess } from "../utils/Toast";
 import Cookies from "js-cookie";
-
-/* ───────────── icons ───────────── */
-const Icon = ({ children, className = "" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={`w-5 h-5 ${className}`}
-  >
-    {children}
-  </svg>
-);
-const PenIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-    />
-  </Icon>
-);
-const SparklesIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z"
-    />
-  </Icon>
-);
-const EyeIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-    />
-  </Icon>
-);
-const ArrowRightIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-    />
-  </Icon>
-);
-const CheckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m4.5 12.75 6 6 9-13.5"
-    />
-  </Icon>
-);
+import { PageHeader, Eyebrow } from "../components/ui/Primitives";
+import Pill from "../components/ui/Pill";
+import Reveal from "../components/ui/Reveal";
+import SmartImage from "../components/ui/SmartImage";
+import { ArrowRight, Check, Spinner, Sparkle } from "../components/ui/Icons";
+import { EyeIcon, PenIcon, useCategoryImages } from "./info/InfoKit";
 
 /* ───────────── data ───────────── */
 const principles = [
@@ -78,7 +19,7 @@ const principles = [
       "Every notebook follows a clear, calm layout with no visual clutter. We design for focus first.",
   },
   {
-    icon: SparklesIcon,
+    icon: Sparkle,
     title: "Premium Writing Feel",
     description:
       "Paper texture, line balance, and cover durability are selected for everyday quality and long-term use.",
@@ -91,11 +32,19 @@ const principles = [
   },
 ];
 
+const highlights = [
+  "Curated selection",
+  "Premium paper",
+  "Consistent design",
+  "Calm shopping",
+];
+
 /* ───────────── main component ───────────── */
 const About = () => {
   const [email, setEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const images = useCategoryImages();
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -119,213 +68,214 @@ const About = () => {
     }
   };
 
+  const storyImage = images[0];
+  const newsletterImage = images[1] || images[0];
+
   return (
-    <main className="bg-white text-gray-900">
+    <div className="text-ink">
       {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative py-24 sm:py-32 px-6 overflow-hidden bg-surface">
-        {/* Decorative */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/[0.02] rounded-full -translate-x-1/2 translate-y-1/2" />
-
-        <div className="max-w-3xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-              Est. 2024
-            </span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-5">
-            We Are{" "}
-            <span className="relative">
-              Notervo
-              <svg
-                className="absolute -bottom-1 left-0 w-full"
-                viewBox="0 0 200 8"
-                fill="none"
-              >
-                <path
-                  d="M1 5.5C40 2 80 1 100 3C120 5 160 6.5 199 3"
-                  stroke="#222222"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  opacity="0.15"
-                />
-              </svg>
-            </span>
-          </h1>
-          <p className="text-base sm:text-lg text-gray-500 leading-relaxed max-w-xl mx-auto mb-8">
-            A notebook-focused brand built on clarity, calm visual language, and
-            premium writing essentials.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
-            <Link
+      <PageHeader
+        eyebrow="Est. 2024"
+        title="We Are Notervo"
+        description="A notebook-focused brand built on clarity, calm visual language, and premium writing essentials."
+        actions={
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Pill
               to="/shop"
-              className="group inline-flex items-center justify-center gap-2 px-7 py-3 bg-primary text-white font-semibold text-sm rounded-xl hover:bg-black transition-colors shadow-lg shadow-primary/15"
+              variant="solid"
+              size="lg"
+              arrow
+              className="w-full sm:w-auto"
             >
               Shop Notebooks
-              <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
+            </Pill>
+            <Pill
               to="/contact"
-              className="inline-flex items-center justify-center px-7 py-3 border-2 border-gray-200 text-gray-700 font-semibold text-sm rounded-xl hover:border-primary hover:text-primary transition-all"
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto"
             >
               Contact Us
-            </Link>
+            </Pill>
+          </div>
+        }
+        className="[&>div>div:last-child]:w-full sm:[&>div>div:last-child]:w-auto"
+      />
+
+      {/* ═══════════════ STORY (two-up) ═══════════════ */}
+      <section
+        aria-labelledby="story-title"
+        className="mt-2 grid md:mt-0 md:grid-cols-2 md:border-b md:border-ink-line"
+      >
+        <div className="relative mx-4 aspect-[4/3] overflow-hidden rounded-2xl bg-cream-dim md:mx-0 md:aspect-auto md:min-h-[640px] md:rounded-none md:border-r md:border-ink-line">
+          <SmartImage
+            src={storyImage}
+            alt="Notervo notebook workspace"
+            width={1400}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Existing brand detail kept from the previous floating card */}
+          <div className="absolute bottom-4 left-4 bg-cream px-4 py-3 md:bottom-8 md:left-8 md:px-5 md:py-4">
+            <p className="font-serif text-[26px] font-light leading-none md:text-[34px]">
+              50+
+            </p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.02em] text-muted">
+              Notebook designs
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* ═══════════════ STORY ═══════════════ */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              Our Story
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-6">
-              Making notebook shopping intentional
-            </h2>
-            <div className="space-y-4 text-gray-500 leading-relaxed">
-              <p>
-                Notervo started with one goal: make notebook shopping
-                intentional instead of overwhelming. We focus on a refined set
-                of categories, practical specifications, and clean product
-                pages.
-              </p>
-              <p>
-                Every release is reviewed for paper quality, binding
-                reliability, and visual consistency with our brand system.
-                Customers can choose quickly with confidence.
-              </p>
-            </div>
-
-            {/* Highlights */}
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              {[
-                "Curated selection",
-                "Premium paper",
-                "Consistent design",
-                "Calm shopping",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center flex-shrink-0">
-                    <CheckIcon className="w-3 h-3 text-primary" />
-                  </span>
-                  <span className="text-sm text-gray-600 font-medium">
-                    {item}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="rounded-2xl overflow-hidden shadow-2xl shadow-gray-200/50">
-              <img
-                src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80"
-                alt="Notervo notebook workspace"
-                className="w-full h-auto object-cover"
-                loading="lazy"
-              />
-            </div>
-            {/* Floating stat card */}
-            <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl border border-gray-100 shadow-xl px-5 py-4 hidden sm:block">
-              <p className="text-2xl font-extrabold text-gray-900">50+</p>
-              <p className="text-xs text-gray-500 font-medium">
-                Notebook designs
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ PRINCIPLES ═══════════════ */}
-      <section className="py-20 px-6 bg-surface">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              <span className="w-6 h-px bg-primary" />
-              Philosophy
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Brand Principles
-            </h2>
-            <p className="text-gray-500 text-sm mt-2 max-w-lg mx-auto">
-              Clear structure, premium calm mood, and a minimal monochrome
-              palette.
+        <Reveal className="flex flex-col px-4 pt-8 md:px-[var(--gutter)] md:py-16 lg:px-20 lg:py-20">
+          <Eyebrow className="mb-3 text-muted md:mb-5">Our Story</Eyebrow>
+          <h2
+            id="story-title"
+            className="font-serif text-[28px] font-light leading-[1.02] tracking-tight md:text-display"
+          >
+            Making notebook shopping intentional
+          </h2>
+          <div className="mt-5 space-y-4 text-[15px] leading-relaxed text-ink/80 md:mt-8 md:text-[17px]">
+            <p>
+              Notervo started with one goal: make notebook shopping intentional
+              instead of overwhelming. We focus on a refined set of categories,
+              practical specifications, and clean product pages.
+            </p>
+            <p>
+              Every release is reviewed for paper quality, binding reliability,
+              and visual consistency with our brand system. Customers can choose
+              quickly with confidence.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {principles.map(({ icon: Ico, title, description }, _i) => (
-              <div
-                key={title}
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 p-7 transition-all duration-300"
+          <ul className="mt-8 grid grid-cols-2 border-t border-ink/15 md:mt-auto md:border-ink-line">
+            {highlights.map((item, i) => (
+              <li
+                key={item}
+                className={`flex items-center gap-2.5 border-b border-ink/15 py-4 text-[13px] uppercase tracking-[0.02em] md:border-ink-line md:py-5 ${i % 2 === 0 ? "pr-3" : "border-l pl-4"}`}
               >
-                <span className="w-11 h-11 rounded-xl bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-5 transition-colors">
-                  <Ico className="w-5 h-5 text-primary" />
-                </span>
-                <h3 className="text-base font-bold text-gray-900 mb-2">
+                <Check className="h-4 w-4 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </section>
+
+      {/* ═══════════════ PRINCIPLES (icons slice) ═══════════════ */}
+      <section
+        aria-labelledby="principles-title"
+        className="mt-10 grid md:mt-0 md:grid-cols-[minmax(320px,38%)_1fr] md:border-b md:border-ink-line lg:grid-cols-[minmax(380px,29%)_1fr]"
+      >
+        <Reveal className="px-4 pb-5 md:border-r md:border-ink-line md:px-[var(--gutter)] md:py-16">
+          <Eyebrow className="mb-2 text-muted md:mb-4">Philosophy</Eyebrow>
+          <h2
+            id="principles-title"
+            className="font-serif text-[28px] font-light leading-none tracking-tight md:text-display"
+          >
+            Brand Principles
+          </h2>
+          <p className="mt-3 max-w-sm text-[14px] leading-snug text-muted md:mt-6 md:text-[16px] md:text-ink/80">
+            Clear structure, premium calm mood, and a minimal monochrome
+            palette.
+          </p>
+        </Reveal>
+
+        <ul className="mx-4 overflow-hidden rounded-2xl border border-ink/10 bg-white/60 md:mx-0 md:grid md:grid-cols-3 md:rounded-none md:border-0 md:bg-transparent">
+          {principles.map(({ icon: Ico, title, description }, i) => (
+            <Reveal
+              as="li"
+              key={title}
+              delay={i * 90}
+              className="flex gap-4 border-b border-ink/10 p-4 last:border-b-0 md:block md:border-b-0 md:border-r md:border-ink-line md:px-8 md:py-16 md:last:border-r-0"
+            >
+              <Ico
+                className="h-7 w-7 shrink-0 md:h-12 md:w-12"
+                strokeWidth={1.2}
+              />
+              <div className="min-w-0">
+                <h3 className="font-sans text-[16px] font-medium md:mt-14 md:font-serif md:text-[28px] md:font-light md:leading-tight">
                   {title}
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="mt-1 text-[14px] leading-snug text-muted md:mt-4 md:text-[15px]">
                   {description}
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
+            </Reveal>
+          ))}
+        </ul>
       </section>
 
-      {/* ═══════════════ NEWSLETTER CTA ═══════════════ */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-primary px-8 py-14 sm:px-14 sm:py-20 text-center">
-            {/* Decorative */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
+      {/* ═══════════════ NEWSLETTER (two-up feature) ═══════════════ */}
+      <section
+        aria-labelledby="newsletter-title"
+        className="relative mt-10 px-4 pb-6 md:mt-0 md:flex md:min-h-[640px] md:items-center md:justify-center md:overflow-hidden md:bg-ink md:px-[var(--gutter)] md:py-20"
+      >
+        <SmartImage
+          src={newsletterImage}
+          alt=""
+          width={2000}
+          sizes="100vw"
+          className="absolute inset-0 hidden h-full w-full scale-105 object-cover blur-[2px] md:block"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 hidden bg-ink/35 md:block"
+        />
 
-            <div className="relative z-10">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-3">
-                Join the Notervo Newsletter
-              </h2>
-              <p className="text-sm sm:text-base text-gray-300 max-w-md mx-auto mb-8 leading-relaxed">
-                Get updates on new notebook drops, limited editions, and
-                practical writing guidance.
-              </p>
-              <form
-                onSubmit={handleSubscribe}
-                className="flex flex-col sm:flex-row gap-2.5 justify-center max-w-md mx-auto"
+        <Reveal className="relative z-10 rounded-[28px] bg-ink p-6 text-cream md:w-full md:max-w-[760px] md:rounded-none md:bg-cream md:p-12 md:text-ink lg:p-14">
+          <Eyebrow className="text-cream/70 md:text-muted">Newsletter</Eyebrow>
+          <h2
+            id="newsletter-title"
+            className="mt-3 font-serif text-[26px] font-light leading-[1.02] md:mt-6 md:text-display"
+          >
+            Join the Notervo Newsletter
+          </h2>
+          <p className="mt-3 max-w-md text-[14px] leading-snug text-cream/75 md:mt-5 md:text-[16px] md:text-ink/80">
+            Get updates on new notebook drops, limited editions, and practical
+            writing guidance.
+          </p>
+
+          <form onSubmit={handleSubscribe} className="mt-6 max-w-md md:mt-10">
+            <label htmlFor="about-email" className="sr-only">
+              Email address
+            </label>
+            <div className="flex items-center gap-2 rounded-full bg-cream p-1 md:gap-0 md:rounded-none md:border-b md:border-ink/40 md:bg-transparent md:p-0 md:focus-within:border-ink">
+              <input
+                id="about-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                autoComplete="email"
+                className="h-11 min-w-0 flex-1 bg-transparent px-4 text-[15px] text-ink placeholder:text-muted focus:outline-none md:px-0"
+                required
+              />
+              <button
+                type="submit"
+                disabled={subscribing}
+                aria-label="Subscribe"
+                className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[13px] uppercase text-cream disabled:opacity-50 md:w-11 md:bg-transparent md:px-0 md:text-ink md:transition-transform md:hover:translate-x-1"
               >
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="flex-1 min-w-0 px-5 py-3 rounded-xl text-sm text-white bg-white/10 border border-white/10 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-transparent transition-all"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={subscribing}
-                  className="px-7 py-3 bg-white text-primary font-bold text-sm rounded-xl hover:bg-secondary transition-colors duration-200 disabled:opacity-50 flex-shrink-0"
-                >
-                  {subscribing ? "..." : "Subscribe"}
-                </button>
-              </form>
-              {subscribed && (
-                <p className="text-xs text-green-400 mt-3 flex items-center justify-center gap-1">
-                  <CheckIcon className="w-3.5 h-3.5" />
-                  You're subscribed!
-                </p>
-              )}
+                {subscribing ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <>
+                    <span className="md:sr-only">Subscribe</span>
+                    <ArrowRight className="hidden h-5 w-5 md:block" />
+                  </>
+                )}
+              </button>
             </div>
-          </div>
-        </div>
+            {subscribed && (
+              <p className="mt-3 flex items-center gap-1.5 text-[13px]">
+                <Check className="h-4 w-4" />
+                You're subscribed!
+              </p>
+            )}
+          </form>
+        </Reveal>
       </section>
-    </main>
+    </div>
   );
 };
 
