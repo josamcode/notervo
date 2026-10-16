@@ -4,8 +4,19 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { showError } from "../utils/Toast";
-import { resolveProductImageUrl } from "../utils/imageUrl";
-import Currency from "../components/Currency";
+import SmartImage from "../components/ui/SmartImage";
+import Reveal from "../components/ui/Reveal";
+import {
+  EmptyState,
+  PageHeader,
+  formatMoney,
+} from "../components/ui/Primitives";
+import {
+  Bag,
+  ChevronRight,
+  Heart,
+  User as UserIcon,
+} from "../components/ui/Icons";
 
 /* ───────────────────────── icon helpers ───────────────────────── */
 const Icon = ({ children, className = "" }) => (
@@ -15,39 +26,13 @@ const Icon = ({ children, className = "" }) => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
+    aria-hidden="true"
     className={`w-5 h-5 ${className}`}
   >
     {children}
   </svg>
 );
 
-const UserIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </Icon>
-);
-const PhoneIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-    />
-  </Icon>
-);
-const CalendarIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v9.75"
-    />
-  </Icon>
-);
 const PackageIcon = (p) => (
   <Icon {...p}>
     <path
@@ -57,50 +42,12 @@ const PackageIcon = (p) => (
     />
   </Icon>
 );
-const HeartIcon = (p) => (
+const GridIcon = (p) => (
   <Icon {...p}>
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-    />
-  </Icon>
-);
-const CartIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 6H6"
-    />
-    <circle cx="9" cy="20" r="1.5" />
-    <circle cx="17" cy="20" r="1.5" />
-  </Icon>
-);
-const TruckIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25m-2.25 0h-2.25m0 0V5.625A1.125 1.125 0 0 0 8.625 4.5H3.375A1.125 1.125 0 0 0 2.25 5.625v8.25"
-    />
-  </Icon>
-);
-const ChevronRightIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m8.25 4.5 7.5 7.5-7.5 7.5"
-    />
-  </Icon>
-);
-const CreditCardIcon = (p) => (
-  <Icon {...p}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
+      d="M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z"
     />
   </Icon>
 );
@@ -109,78 +56,30 @@ const CreditCardIcon = (p) => (
 const STATUS_CONFIG = {
   pending: {
     label: "Pending",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    dot: "bg-amber-400",
+    badge: "border border-ink/30 text-ink",
     progress: "w-1/4",
-    barColor: "bg-amber-400",
   },
   processing: {
     label: "Processing",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    dot: "bg-blue-500",
+    badge: "bg-periwinkle text-ink",
     progress: "w-1/2",
-    barColor: "bg-blue-500",
   },
   shipped: {
     label: "Shipped",
-    color: "text-yellow-600",
-    bg: "bg-yellow-50",
-    border: "border-primary/20",
-    dot: "bg-yellow-400",
+    badge: "bg-cream-deep border border-ink/20 text-ink",
     progress: "w-3/4",
-    barColor: "bg-yellow-500",
   },
   delivered: {
     label: "Delivered",
-    color: "text-green-600",
-    bg: "bg-green-50",
-    border: "border-green-200",
-    dot: "bg-green-500",
+    badge: "bg-ink text-cream",
     progress: "w-full",
-    barColor: "bg-green-500",
   },
   cancelled: {
     label: "Cancelled",
-    color: "text-red-500",
-    bg: "bg-red-50",
-    border: "border-gray-200",
-    dot: "bg-red-400",
+    badge: "border border-ember/50 text-ember",
     progress: "w-0",
-    barColor: "bg-gray-300",
   },
 };
-
-/* ───────────────────────── stat card ───────────────────────── */
-const StatCard = ({ icon: IconComp, label, value, unit, accent }) => (
-  <div
-    className={`relative overflow-hidden rounded-2xl border ${accent === "primary" ? "border-primary/10 bg-primary/[0.03]" : accent === "green" ? "border-green-100 bg-green-50/50" : "border-gray-100 bg-gray-50/50"} p-4`}
-  >
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-          {label}
-        </p>
-        <p
-          className={`text-2xl font-extrabold tracking-tight ${accent === "primary" ? "text-primary" : accent === "green" ? "text-green-600" : "text-gray-900"}`}
-        >
-          {value}
-          {unit && <span className="text-sm font-semibold ml-1">{unit}</span>}
-        </p>
-      </div>
-      <span
-        className={`w-9 h-9 rounded-xl flex items-center justify-center ${accent === "primary" ? "bg-primary/10" : accent === "green" ? "bg-green-100" : "bg-gray-100"}`}
-      >
-        <IconComp
-          className={`w-[18px] h-[18px] ${accent === "primary" ? "text-primary" : accent === "green" ? "text-green-600" : "text-gray-500"}`}
-        />
-      </span>
-    </div>
-  </div>
-);
 
 /* ───────────────────────── order card ───────────────────────── */
 const OrderCard = ({ order, getOrderLinkId, getOrderDisplayId }) => {
@@ -190,89 +89,72 @@ const OrderCard = ({ order, getOrderLinkId, getOrderDisplayId }) => {
   return (
     <Link
       to={`/order-confirmation/${getOrderLinkId(order)}`}
-      className="group block bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200 overflow-hidden"
+      className="group block overflow-hidden rounded-2xl border border-ink/10 bg-white/60 transition-colors duration-200 active:bg-cream-deep md:rounded-none md:border-0 md:border-b md:border-ink/15 md:bg-transparent md:hover:bg-cream-deep/60"
     >
-      {/* Top bar — status + progress */}
+      {/* Progress line */}
       {order.state !== "cancelled" && (
-        <div className="h-1 w-full bg-gray-100">
-          <div
-            className={`h-full rounded-r-full transition-all duration-500 ${sc.progress} ${sc.barColor}`}
-          />
+        <div className="h-[2px] w-full bg-ink/10 md:hidden">
+          <div className={`h-full bg-ink ${sc.progress}`} />
         </div>
       )}
 
-      <div className="p-5 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-          {/* Left info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h3 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">
+      <div className="p-4 md:px-0 md:py-6">
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h3 className="font-sans text-[15px] tracking-normal text-ink md:text-[16px]">
                 #{getOrderDisplayId(order)}
               </h3>
-              <span
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full capitalize ${sc.bg} ${sc.color} ${sc.border} border`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-                {sc.label}
-              </span>
+              <span className={`badge ${sc.badge}`}>{sc.label}</span>
             </div>
-
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-gray-400">
-              <span className="flex items-center gap-1">
-                <CalendarIcon className="w-3.5 h-3.5" />
-                {new Date(order.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-              <span className="flex items-center gap-1">
-                <CreditCardIcon className="w-3.5 h-3.5" />
-                {order.paymentMethod === "CashOnDelivery"
-                  ? "COD"
-                  : order.paymentMethod}
-              </span>
-              <span className="flex items-center gap-1">
-                <PackageIcon className="w-3.5 h-3.5" />
-                {itemCount} {itemCount === 1 ? "item" : "items"}
-              </span>
-            </div>
+            <p className="mt-1.5 text-[13px] text-muted">
+              {new Date(order.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+              {" · "}
+              {order.paymentMethod === "CashOnDelivery"
+                ? "COD"
+                : order.paymentMethod}
+              {" · "}
+              {itemCount} {itemCount === 1 ? "item" : "items"}
+            </p>
           </div>
 
-          {/* Right — price + arrow */}
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-base font-extrabold text-gray-900">
-                {order.total.toFixed(2)}
-              </p>
-              <p className="text-[11px] text-gray-400 font-medium">
-                <Currency />
-              </p>
-            </div>
-            <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <p className="text-right text-[15px] text-ink">
+              {formatMoney(order.total)}
+            </p>
+            <ChevronRight className="h-4 w-4 text-ink/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-ink" />
           </div>
         </div>
 
         {/* Product image strip */}
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-50">
-          <div className="flex -space-x-2 overflow-hidden">
+        <div className="mt-4 flex items-center gap-2">
+          <div className="flex -space-x-2">
             {order.items.slice(0, 5).map((item, idx) => (
-              <img
+              <SmartImage
                 key={item._id}
-                src={resolveProductImageUrl(item.image)}
+                src={item.image}
                 alt={item.name || "Product"}
-                className="w-10 h-10 rounded-lg object-cover border-2 border-white flex-shrink-0"
+                width={120}
+                sizes="44px"
+                className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border-2 border-cream object-cover md:rounded-none"
+                fallbackClassName="[&>span]:hidden"
                 style={{ zIndex: 5 - idx }}
-                onError={(e) => {
-                  e.target.src = "/images/fallback-product.png";
-                }}
               />
             ))}
           </div>
           {order.items.length > 5 && (
-            <span className="text-xs text-gray-400 font-medium ml-1">
+            <span className="ml-1 text-[12px] text-muted">
               +{order.items.length - 5} more
             </span>
+          )}
+          {order.state !== "cancelled" && (
+            <div className="ml-auto hidden h-[2px] w-32 bg-ink/10 md:block">
+              <div className={`h-full bg-ink ${sc.progress}`} />
+            </div>
           )}
         </div>
       </div>
@@ -338,20 +220,24 @@ const Profile = () => {
   /* ───── Loading ───── */
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="h-56 bg-gray-100 rounded-2xl animate-pulse" />
+      <div aria-busy="true">
+        <div className="container-x pb-5 pt-4 md:border-b md:border-ink-line md:pb-8 md:pt-12">
+          <div className="skeleton h-3 w-20" />
+          <div className="skeleton mt-4 h-9 w-56 md:h-14 md:w-80" />
+        </div>
+        <div className="container-x grid gap-6 py-6 lg:grid-cols-[minmax(320px,29%)_1fr] lg:gap-12 lg:py-12">
+          <div className="space-y-4">
+            <div className="skeleton h-48 rounded-2xl md:rounded-none" />
             <div className="grid grid-cols-2 gap-3">
-              <div className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
-              <div className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
+              <div className="skeleton h-24 rounded-2xl md:rounded-none" />
+              <div className="skeleton h-24 rounded-2xl md:rounded-none" />
             </div>
           </div>
-          <div className="lg:col-span-3 space-y-4">
+          <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="h-32 bg-gray-100 rounded-2xl animate-pulse"
+                className="skeleton h-28 rounded-2xl md:rounded-none"
               />
             ))}
           </div>
@@ -363,21 +249,13 @@ const Profile = () => {
   /* ───── Not found ───── */
   if (!user) {
     return (
-      <div className="max-w-lg mx-auto px-6 py-28 text-center">
-        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-gray-100 flex items-center justify-center">
-          <UserIcon className="w-7 h-7 text-gray-400" />
-        </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">User Not Found</h2>
-        <p className="text-gray-500 text-sm mb-6">
-          We couldn't load your profile.
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-black transition-colors"
-        >
-          Retry
-        </button>
-      </div>
+      <EmptyState
+        icon={UserIcon}
+        title="User not found"
+        description="We couldn't load your profile."
+        actionLabel="Retry"
+        onAction={() => window.location.reload()}
+      />
     );
   }
 
@@ -430,232 +308,183 @@ const Profile = () => {
     month: "long",
   });
 
+  const quickLinks = [
+    { to: "/wishlist", label: "Wishlist", icon: Heart },
+    { to: "/cart", label: "Cart", icon: Bag },
+    { to: "/shop", label: "Shop", icon: GridIcon },
+  ];
+
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      {/* ───── Page header ───── */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-          My Account
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Manage your profile and orders
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Account"
+        title="My account"
+        description="Manage your profile and orders"
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+      <div className="container-x grid items-start gap-6 pb-10 pt-2 md:pt-0 lg:grid-cols-[minmax(320px,29%)_1fr] lg:gap-0">
         {/* ───── LEFT: Profile sidebar ───── */}
-        <div className="lg:col-span-2">
-          <div className="lg:sticky lg:top-24 space-y-4">
-            {/* Profile card */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              {/* Header band */}
-              <div className="h-20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
-
-              <div className="px-6 pb-6 -mt-10">
-                {/* Avatar */}
-                <div className="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-primary/20 border-4 border-white">
-                  {initials}
-                </div>
-
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900">
-                      {user.username}
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Member since {memberSince}
-                    </p>
-                  </div>
-
-                  {/* Info rows */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                      <span className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm">
-                        <PhoneIcon className="w-4 h-4 text-gray-500" />
-                      </span>
-                      <div>
-                        <p className="text-[11px] text-gray-400 font-medium">
-                          Phone
-                        </p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {user.phone}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                      <span className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm">
-                        <CalendarIcon className="w-4 h-4 text-gray-500" />
-                      </span>
-                      <div>
-                        <p className="text-[11px] text-gray-400 font-medium">
-                          Joined
-                        </p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {memberSince}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <aside className="space-y-4 md:space-y-0 lg:sticky lg:top-[calc(var(--bar-h)+24px)] lg:border-r lg:border-ink-line lg:pr-10">
+          {/* Profile card */}
+          <section className="panel p-5 md:border-0 md:px-0 md:pb-8 md:pt-10">
+            <div className="flex items-center gap-4">
+              <span
+                aria-hidden="true"
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-ink font-serif text-[22px] text-cream md:h-16 md:w-16"
+              >
+                {initials}
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate font-serif text-[24px] font-light leading-tight md:text-[30px]">
+                  {user.username}
+                </h2>
+                <p className="mt-0.5 text-[13px] text-muted">
+                  Member since {memberSince}
+                </p>
               </div>
-            </section>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <StatCard
-                icon={PackageIcon}
-                label="Orders"
-                value={orders.length}
-                accent="primary"
-              />
-              <StatCard
-                icon={CreditCardIcon}
-                label="Total Spent"
-                value={totalSpent.toFixed(0)}
-                unit={<Currency />}
-                accent="green"
-              />
             </div>
 
-            {/* Quick links */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-3 border-b border-gray-100">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Quick Links
-                </h3>
+            <dl className="mt-5 divide-y divide-ink/10 border-y border-ink/10 md:mt-8">
+              <div className="flex items-center justify-between gap-4 py-3">
+                <dt className="text-[12px] uppercase text-muted">Phone</dt>
+                <dd className="text-[14px] text-ink">{user.phone}</dd>
               </div>
-              <div className="divide-y divide-gray-50">
-                <Link
-                  to="/wishlist"
-                  className="flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors group"
-                >
-                  <span className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
-                    <HeartIcon className="w-4 h-4 text-red-500" />
-                  </span>
-                  <span className="flex-1 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                    Wishlist
-                  </span>
-                  <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                </Link>
-                <Link
-                  to="/cart"
-                  className="flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors group"
-                >
-                  <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <CartIcon className="w-4 h-4 text-primary" />
-                  </span>
-                  <span className="flex-1 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                    Cart
-                  </span>
-                  <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                </Link>
-                <Link
-                  to="/shop"
-                  className="flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors group"
-                >
-                  <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
-                    <TruckIcon className="w-4 h-4 text-green-600" />
-                  </span>
-                  <span className="flex-1 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                    Shop
-                  </span>
-                  <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                </Link>
+              <div className="flex items-center justify-between gap-4 py-3">
+                <dt className="text-[12px] uppercase text-muted">Joined</dt>
+                <dd className="text-[14px] text-ink">{memberSince}</dd>
               </div>
-            </section>
+            </dl>
+          </section>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 md:gap-0 md:border-y md:border-ink-line">
+            <div className="rounded-2xl bg-cream-deep p-4 md:rounded-none md:border-r md:border-ink-line md:bg-transparent md:px-0 md:py-6">
+              <p className="text-[12px] uppercase text-muted">Orders</p>
+              <p className="mt-2 font-serif text-[32px] font-light leading-none">
+                {orders.length}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-cream-deep p-4 md:rounded-none md:bg-transparent md:py-6 md:pl-6 md:pr-0">
+              <p className="text-[12px] uppercase text-muted">Total spent</p>
+              <p className="mt-2 font-serif text-[32px] font-light leading-none">
+                {totalSpent.toFixed(0)}
+                <span className="ml-1 font-sans text-[13px] text-muted">
+                  EGP
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
+
+          {/* Quick links */}
+          <nav
+            aria-label="Quick links"
+            className="panel overflow-hidden md:border-0 md:pt-6"
+          >
+            <h3 className="px-4 pb-1 pt-4 font-sans text-[12px] uppercase tracking-normal text-muted md:px-0 md:pt-0">
+              Quick links
+            </h3>
+            <ul className="divide-y divide-ink/10">
+              {quickLinks.map(({ to, label, icon: LinkIcon }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="group flex min-h-[52px] items-center gap-3 px-4 text-[15px] text-ink active:bg-cream-deep md:px-0"
+                  >
+                    <LinkIcon className="h-[18px] w-[18px]" />
+                    <span className="flex-1">{label}</span>
+                    <ChevronRight className="h-4 w-4 text-ink/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-ink" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
 
         {/* ───── RIGHT: Orders ───── */}
-        <div className="lg:col-span-3 space-y-5">
-          {/* Section header + filter tabs */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <PackageIcon className="w-[18px] h-[18px] text-primary" />
-                <h2 className="text-base font-semibold text-gray-900">
-                  My Orders
-                </h2>
-              </div>
-              <span className="text-xs text-gray-400 font-medium">
-                {orders.length} total
-              </span>
-            </div>
+        <section
+          aria-labelledby="orders-title"
+          className="min-w-0 lg:pl-10 lg:pt-10"
+        >
+          <div className="mb-4 flex items-end justify-between md:mb-6">
+            <h2
+              id="orders-title"
+              className="font-serif text-[26px] font-light leading-none md:text-display"
+            >
+              My orders
+            </h2>
+            <span className="text-[13px] text-muted">
+              {orders.length} total
+            </span>
+          </div>
 
-            {/* Filter tabs */}
-            {orders.length > 0 && tabs.length > 1 && (
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                {tabs.map((tab) => (
+          {/* Filter tabs */}
+          {orders.length > 0 && tabs.length > 1 && (
+            <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:mb-2 md:px-0">
+              {tabs.map((tab) => {
+                const active = activeTab === tab.key;
+                return (
                   <button
                     key={tab.key}
+                    type="button"
                     onClick={() => setActiveTab(tab.key)}
-                    className={`
-                                            flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200
-                                            ${
-                                              activeTab === tab.key
-                                                ? "bg-primary text-white shadow-md shadow-primary/20"
-                                                : "bg-white text-gray-600 border border-gray-200 hover:border-primary/30 hover:text-primary"
-                                            }
-                                        `}
+                    aria-pressed={active}
+                    className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] transition-colors duration-200 ${
+                      active
+                        ? "border-ink bg-ink text-cream"
+                        : "border-ink/25 text-ink hover:border-ink"
+                    }`}
                   >
                     {tab.label}
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === tab.key ? "bg-white/20" : "bg-gray-100"}`}
-                    >
+                    <span className={active ? "text-cream/70" : "text-muted"}>
                       {tab.count}
                     </span>
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Orders list */}
           {orders.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <PackageIcon className="w-7 h-7 text-gray-400" />
-              </div>
-              <h3 className="text-base font-bold text-gray-900 mb-1">
-                No orders yet
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Start shopping to see your orders here.
-              </p>
-              <Link
-                to="/shop"
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-black transition-colors"
-              >
-                Browse Shop
-              </Link>
+            <div className="panel md:border-y md:border-ink/15">
+              <EmptyState
+                icon={PackageIcon}
+                title="No orders yet"
+                description="Start shopping to see your orders here."
+                actionLabel="Browse shop"
+                actionTo="/shop"
+                className="!py-12 md:!py-16"
+              />
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <p className="text-sm text-gray-500">
+            <div className="panel py-12 text-center md:border-y md:border-ink/15">
+              <p className="text-[14px] text-muted">
                 No {activeTab} orders found.
               </p>
               <button
+                type="button"
                 onClick={() => setActiveTab("all")}
-                className="mt-3 text-sm text-primary font-medium hover:underline"
+                className="link-underline mt-3 text-[13px] uppercase text-ink"
               >
                 View all orders
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredOrders.map((order) => (
-                <OrderCard
-                  key={order._id}
-                  order={order}
-                  getOrderLinkId={getOrderLinkId}
-                  getOrderDisplayId={getOrderDisplayId}
-                />
+            <div className="space-y-3 md:space-y-0 md:border-t md:border-ink/15">
+              {filteredOrders.map((order, i) => (
+                <Reveal key={order._id} delay={Math.min(i, 6) * 50} fade>
+                  <OrderCard
+                    order={order}
+                    getOrderLinkId={getOrderLinkId}
+                    getOrderDisplayId={getOrderDisplayId}
+                  />
+                </Reveal>
               ))}
             </div>
           )}
-        </div>
+        </section>
       </div>
-    </main>
+    </div>
   );
 };
 
