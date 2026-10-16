@@ -117,6 +117,33 @@ export async function removeFromCart(productId, color = null, size = null) {
   }
 }
 
+// Product cards each ask "is this in my cart?"; share one GET per burst of checks.
+let cartLookup = null;
+if (typeof window !== "undefined") {
+  window.addEventListener("cartUpdated", () => {
+    cartLookup = null;
+  });
+}
+
+function fetchCartItemsShared(token) {
+  if (!cartLookup || cartLookup.token !== token) {
+    const request = axios
+      .get(`${import.meta.env.VITE_API_URL}/cart`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => res.data.cart?.items || []);
+    cartLookup = { token, request };
+    request
+      .catch(() => {})
+      .finally(() => {
+        setTimeout(() => {
+          if (cartLookup?.request === request) cartLookup = null;
+        }, 1500);
+      });
+  }
+  return cartLookup.request;
+}
+
 export async function checkProductInCart(productId, color, size) {
   const token = Cookies.get("token");
   if (!token) {
@@ -124,11 +151,7 @@ export async function checkProductInCart(productId, color, size) {
   }
 
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const cartItems = res.data.cart?.items || [];
+    const cartItems = await fetchCartItemsShared(token);
 
     return cartItems.some(
       (item) =>

@@ -75,16 +75,39 @@ export async function removeFromWishlist(productId) {
   }
 }
 
+// Share one wishlist GET across the product cards rendered together.
+let wishlistLookup = null;
+if (typeof window !== "undefined") {
+  window.addEventListener("wishlistUpdated", () => {
+    wishlistLookup = null;
+  });
+}
+
+function fetchWishlistItemsShared(token) {
+  if (!wishlistLookup || wishlistLookup.token !== token) {
+    const request = axios
+      .get(`${import.meta.env.VITE_API_URL}/wishlist`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => res.data.wishlist?.items || []);
+    wishlistLookup = { token, request };
+    request
+      .catch(() => {})
+      .finally(() => {
+        setTimeout(() => {
+          if (wishlistLookup?.request === request) wishlistLookup = null;
+        }, 1500);
+      });
+  }
+  return wishlistLookup.request;
+}
+
 export async function checkProductInWishlist(productId) {
   const token = Cookies.get("token");
   if (!token) return hasGuestWishlistItem(productId);
 
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/wishlist`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const wishlistItems = res.data.wishlist.items || [];
+    const wishlistItems = await fetchWishlistItemsShared(token);
 
     return wishlistItems.some((item) => item.productId._id === productId);
   } catch (error) {
